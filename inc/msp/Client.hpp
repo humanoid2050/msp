@@ -55,26 +55,26 @@ public:
     void setLoggingLevel(const LoggingLevel& level);
 
     /**
-     * @brief Change the device path on the next connect
+     * @brief Change the message encoding version
      * @param ver Version of MSP to use
      * @return True if successful
      */
     bool setVersion(const int& ver);
 
     /**
-     * @brief Query the cached device path
+     * @brief Query the message encoding version
      * @return Cached path to device
      */
     int getVersion() const;
 
     /**
-     * @brief Change the device path on the next connect
+     * @brief Change the firmware-specific MSP variant
      * @param device Path to device
      */
     void setVariant(const FirmwareVariant& v);
 
     /**
-     * @brief Query the cached device path
+     * @brief Query the firmware-specific MSP variant
      * @return Cached path to device
      */
     FirmwareVariant getVariant() const;

@@ -32,12 +32,35 @@ void Client::setVariant(const FirmwareVariant& v) { fw_variant = v; }
 FirmwareVariant Client::getVariant() const { return fw_variant; }
 
 bool Client::start(const std::string& device, const size_t baudrate) {
-    return connectPort(device, baudrate) && startReadThread() &&
-           startSubscriptions();
+    //sequentially try to start the various components
+    int cleanup_level = 0;
+    if (!connectPort(device, baudrate)) {
+        cleanup_level = 1;
+    } else if (!startReadThread()) {
+        cleanup_level = 2;
+    } else if (!startSubscriptions() {
+        cleanup_level = 3;
+    }
+    //if something went wrong, stop everything that was started
+    switch (cleanup_level) {
+    case 3:
+        stopSubscriptions();
+    case 2:
+        stopReadThread();
+    case 1:
+        disconnectPort();
+    }
+    //return true if there was no cleanup to be done (no failures)
+    return cleanup_level == 0;
 }
 
 bool Client::stop() {
-    return disconnectPort() && stopReadThread() && stopSubscriptions();
+    bool rc = true;
+    rc &= disconnectPort();
+    rc &= stopReadThread();
+    rc &= stopSubscriptions();
+    return rc;
+
 }
 
 bool Client::connectPort(const std::string& device, const size_t baudrate) {
