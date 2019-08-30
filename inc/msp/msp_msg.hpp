@@ -360,6 +360,8 @@ enum class SwitchPosition : size_t {
     HIGH = 2,
 };
 
+//no MSP message describing these values, so they must be extracted manually
+//from the sourcecode of each firmware
 static const std::vector<std::string> FEATURES = {"RX_PPM",
                                                   "VBAT",
                                                   "INFLIGHT_ACC_CAL",
@@ -384,26 +386,24 @@ static const std::vector<std::string> FEATURES = {"RX_PPM",
                                                   "TRANSPONDER",
                                                   "OSD"};
 
-enum class PID_Element : uint8_t {
-    PID_ROLL = 0,
-    PID_PITCH,
-    PID_YAW,
-    PID_POS_Z,
-    PID_POS_XY,
-    PID_VEL_XY,
-    PID_SURFACE,
-    PID_LEVEL,
-    PID_HEADING,
-    PID_VEL_Z,
-    PID_ITEM_COUNT
+static const std::vector<std::string> INAV_FEATURES = {
+    "THR_VBAT_COMP", "VBAT", "TX_PROF_SEL", "BAT_PROF_AUTOSWITCH", "MOTOR_STOP",
+    "", "SOFTSERIAL", "GPS", "",
+    "", "TELEMETRY", "CURRENT_METER", "3D", "RX_PARALLEL_PWM",
+    "RX_MSP", "RSSI_ADC", "LED_STRIP", "DASHBOARD", "",
+    "BLACKBOX", "", "TRANSPONDER", "AIRMODE",
+    "SUPEREXPO", "VTX", "RX_SPI", "", "PWM_SERVO_DRIVER", "PWM_OUTPUT_ENABLE",
+    "OSD", "FW_LAUNCH"
 };
+
 
 /////////////////////////////////////////////////////////////////////
 /// Cleanflight
 
 // MSP_API_VERSION: 1
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ApiVersion : public Message {
-    ApiVersion(FirmwareVariant v) : Message(v) {}
+    ApiVersion() : Message() {}
 
     virtual ID id() const override { return ID::MSP_API_VERSION; }
 
@@ -428,8 +428,9 @@ struct ApiVersion : public Message {
 };
 
 // MSP_FC_VARIANT: 2
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct FcVariant : public Message {
-    FcVariant(FirmwareVariant v) : Message(v) {}
+    FcVariant() : Message() {}
 
     virtual ID id() const override { return ID::MSP_FC_VARIANT; }
 
@@ -447,8 +448,9 @@ struct FcVariant : public Message {
 };
 
 // MSP_FC_VERSION: 3
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct FcVersion : public Message {
-    FcVersion(FirmwareVariant v) : Message(v) {}
+    FcVersion() : Message() {}
 
     virtual ID id() const override { return ID::MSP_FC_VERSION; }
 
@@ -473,8 +475,9 @@ struct FcVersion : public Message {
 };
 
 // MSP_BOARD_INFO: 4
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BoardInfo : public Message {
-    BoardInfo(FirmwareVariant v) : Message(v) {}
+    BoardInfo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BOARD_INFO; }
 
@@ -508,8 +511,9 @@ struct BoardInfo : public Message {
 };
 
 // MSP_BUILD_INFO: 5
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BuildInfo : public Message {
-    BuildInfo(FirmwareVariant v) : Message(v) {}
+    BuildInfo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BUILD_INFO; }
 
@@ -546,8 +550,9 @@ struct InavPidSettings {
 };
 
 // MSP_INAV_PID: 6
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavPid : public InavPidSettings, public Message {
-    InavPid(FirmwareVariant v) : Message(v) {}
+    InavPid() : Message() {}
 
     virtual ID id() const override { return ID::MSP_INAV_PID; }
 
@@ -568,8 +573,9 @@ struct InavPid : public InavPidSettings, public Message {
 };
 
 // MSP_SET_INAV_PID: 7
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetInavPid : public InavPidSettings, public Message {
-    SetInavPid(FirmwareVariant v) : Message(v) {}
+    SetInavPid() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_INAV_PID; }
 
@@ -592,8 +598,9 @@ struct SetInavPid : public InavPidSettings, public Message {
 };
 
 // MSP_NAME: 10
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BoardName : public Message {
-    BoardName(FirmwareVariant v) : Message(v) {}
+    BoardName() : Message() {}
 
     virtual ID id() const override { return ID::MSP_NAME; }
 
@@ -605,8 +612,9 @@ struct BoardName : public Message {
 };
 
 // MSP_SET_NAME: 11
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetBoardName : public Message {
-    SetBoardName(FirmwareVariant v) : Message(v) {}
+    SetBoardName() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_NAME; }
 
@@ -631,8 +639,9 @@ struct NavPosHoldSettings {
 };
 
 // MSP_NAV_POSHOLD: 12
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct NavPosHold : public NavPosHoldSettings, public Message {
-    NavPosHold(FirmwareVariant v) : Message(v) {}
+    NavPosHold() : Message() {}
 
     virtual ID id() const override { return ID::MSP_NAV_POSHOLD; }
 
@@ -651,8 +660,9 @@ struct NavPosHold : public NavPosHoldSettings, public Message {
 };
 
 // MSP_SET_NAV_POSHOLD: 13
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetNavPosHold : public NavPosHoldSettings, public Message {
-    SetNavPosHold(FirmwareVariant v) : Message(v) {}
+    SetNavPosHold() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_NAV_POSHOLD; }
 
@@ -682,8 +692,9 @@ struct CalibrationDataSettings {
 };
 
 // MSP_CALIBRATION_DATA: 14
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CalibrationData : public CalibrationDataSettings, public Message {
-    CalibrationData(FirmwareVariant v) : Message(v) {}
+    CalibrationData() : Message() {}
 
     virtual ID id() const override { return ID::MSP_CALIBRATION_DATA; }
 
@@ -703,8 +714,9 @@ struct CalibrationData : public CalibrationDataSettings, public Message {
 };
 
 // MSP_SET_CALIBRATION_DATA: 15
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetCalibrationData : public CalibrationDataSettings, public Message {
-    SetCalibrationData(FirmwareVariant v) : Message(v) {}
+    SetCalibrationData() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_CALIBRATION_DATA; }
 
@@ -733,9 +745,10 @@ struct PositionEstimationConfigSettings {
 };
 
 // MSP_POSITION_ESTIMATION_CONFIG: 16
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct PositionEstimationConfig : public PositionEstimationConfigSettings,
                                   public Message {
-    PositionEstimationConfig(FirmwareVariant v) : Message(v) {}
+    PositionEstimationConfig() : Message() {}
 
     virtual ID id() const override {
         return ID::MSP_POSITION_ESTIMATION_CONFIG;
@@ -755,9 +768,10 @@ struct PositionEstimationConfig : public PositionEstimationConfigSettings,
 };
 
 // MSP_SET_POSITION_ESTIMATION_CONFIG: 17
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetPositionEstimationConfig : public PositionEstimationConfigSettings,
                                      public Message {
-    SetPositionEstimationConfig(FirmwareVariant v) : Message(v) {}
+    SetPositionEstimationConfig() : Message() {}
 
     virtual ID id() const override {
         return ID::MSP_SET_POSITION_ESTIMATION_CONFIG;
@@ -779,8 +793,9 @@ struct SetPositionEstimationConfig : public PositionEstimationConfigSettings,
 };
 
 // MSP_WP_MISSION_LOAD: 18
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct WpMissionLoad : public Message {
-    WpMissionLoad(FirmwareVariant v) : Message(v) {}
+    WpMissionLoad() : Message() {}
 
     virtual ID id() const override { return ID::MSP_WP_MISSION_LOAD; }
 
@@ -792,8 +807,9 @@ struct WpMissionLoad : public Message {
 };
 
 // MSP_WP_MISSION_SAVE: 19
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct WpMissionSave : public Message {
-    WpMissionSave(FirmwareVariant v) : Message(v) {}
+    WpMissionSave() : Message() {}
 
     virtual ID id() const override { return ID::MSP_WP_MISSION_SAVE; }
 
@@ -805,8 +821,9 @@ struct WpMissionSave : public Message {
 };
 
 // MSP_WP_GETINFO: 20
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct WpGetInfo : public Message {
-    WpGetInfo(FirmwareVariant v) : Message(v) {}
+    WpGetInfo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_WP_GETINFO; }
 
@@ -841,8 +858,9 @@ struct RthAndLandConfigSettings {
 };
 
 // MSP_RTH_AND_LAND_CONFIG: 21
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RthAndLandConfig : public RthAndLandConfigSettings, public Message {
-    RthAndLandConfig(FirmwareVariant v) : Message(v) {}
+    RthAndLandConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RTH_AND_LAND_CONFIG; }
 
@@ -865,8 +883,9 @@ struct RthAndLandConfig : public RthAndLandConfigSettings, public Message {
 };
 
 // MSP_SET_RTH_AND_LAND_CONFIG: 22
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRthAndLandConfig : public RthAndLandConfigSettings, public Message {
-    SetRthAndLandConfig(FirmwareVariant v) : Message(v) {}
+    SetRthAndLandConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RTH_AND_LAND_CONFIG; }
 
@@ -902,8 +921,9 @@ struct FwConfigSettings {
 };
 
 // MSP_FW_CONFIG: 23
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct FwConfig : public FwConfigSettings, public Message {
-    FwConfig(FirmwareVariant v) : Message(v) {}
+    FwConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_FW_CONFIG; }
 
@@ -922,8 +942,9 @@ struct FwConfig : public FwConfigSettings, public Message {
 };
 
 // MSP_SET_FW_CONFIG: 24
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetFwConfig : public FwConfigSettings, public Message {
-    SetFwConfig(FirmwareVariant v) : Message(v) {}
+    SetFwConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_FW_CONFIG; }
 
@@ -953,8 +974,9 @@ struct BatteryConfigSettings {
 };
 
 // MSP_BATTERY_CONFIG: 32
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BatteryConfig : public BatteryConfigSettings, public Message {
-    BatteryConfig(FirmwareVariant v) : Message(v) {}
+    BatteryConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BATTERY_CONFIG; }
 
@@ -971,8 +993,9 @@ struct BatteryConfig : public BatteryConfigSettings, public Message {
 };
 
 // MSP_SET_BATTERY_CONFIG: 33
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetBatteryConfig : public BatteryConfigSettings, public Message {
-    SetBatteryConfig(FirmwareVariant v) : Message(v) {}
+    SetBatteryConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_BATTERY_CONFIG; }
 
@@ -998,8 +1021,9 @@ struct box_description {
 };
 
 // MSP_MODE_RANGES: 34
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ModeRanges : public Message {
-    ModeRanges(FirmwareVariant v) : Message(v) {}
+    ModeRanges() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MODE_RANGES; }
 
@@ -1018,8 +1042,9 @@ struct ModeRanges : public Message {
 };
 
 // MSP_SET_MODE_RANGE: 35
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetModeRange : public Message {
-    SetModeRange(FirmwareVariant v) : Message(v) {}
+    SetModeRange() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_MODE_RANGE; }
 
@@ -1040,8 +1065,9 @@ struct SetModeRange : public Message {
 };
 
 // MSP_FEATURE: 36
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Feature : public Message {
-    Feature(FirmwareVariant v) : Message(v) {}
+    Feature() : Message() {}
 
     virtual ID id() const override { return ID::MSP_FEATURE; }
 
@@ -1067,9 +1093,22 @@ struct Feature : public Message {
     }
 };
 
+template<>
+bool Feature<FirmwareVariant::INAV>::decode(const ByteVector& data) {
+    uint32_t mask;
+    bool rc = data.unpack(mask);
+    if(!rc) return rc;
+    features.clear();
+    for(size_t ifeat(0); ifeat < INAV_FEATURES.size(); ifeat++) {
+        if(mask & (1 << ifeat)) features.insert(INAV_FEATURES[ifeat]);
+    }
+    return rc;
+}
+
 // MSP_SET_FEATURE: 37
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetFeature : public Message {
-    SetFeature(FirmwareVariant v) : Message(v) {}
+    SetFeature() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_FEATURE; }
 
@@ -1094,8 +1133,9 @@ struct BoardAlignmentSettings {
 };
 
 // MSP_BOARD_ALIGNMENT: 38
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BoardAlignment : public BoardAlignmentSettings, public Message {
-    BoardAlignment(FirmwareVariant v) : Message(v) {}
+    BoardAlignment() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BOARD_ALIGNMENT; }
 
@@ -1109,8 +1149,9 @@ struct BoardAlignment : public BoardAlignmentSettings, public Message {
 };
 
 // MSP_SET_BOARD_ALIGNMENT: 39
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetBoardAlignment : public BoardAlignmentSettings, public Message {
-    SetBoardAlignment(FirmwareVariant v) : Message(v) {}
+    SetBoardAlignment() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BOARD_ALIGNMENT; }
 
@@ -1133,8 +1174,9 @@ struct CurrentMeterConfigSettings {
 };
 
 // MSP_CURRENT_METER_CONFIG: 40 (differs from Cleanflight/BetaFlight)
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CurrentMeterConfig : public CurrentMeterConfigSettings, public Message {
-    CurrentMeterConfig(FirmwareVariant v) : Message(v) {}
+    CurrentMeterConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_CURRENT_METER_CONFIG; }
 
@@ -1149,9 +1191,10 @@ struct CurrentMeterConfig : public CurrentMeterConfigSettings, public Message {
 };
 
 // MSP_SET_CURRENT_METER_CONFIG: 41 (differs from Cleanflight/BetaFlight)
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetCurrentMeterConfig : public CurrentMeterConfigSettings,
                                public Message {
-    SetCurrentMeterConfig(FirmwareVariant v) : Message(v) {}
+    SetCurrentMeterConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_CURRENT_METER_CONFIG; }
 
@@ -1168,8 +1211,9 @@ struct SetCurrentMeterConfig : public CurrentMeterConfigSettings,
 };
 
 // MSP_MIXER: 42
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Mixer : public Message {
-    Mixer(FirmwareVariant v) : Message(v) {}
+    Mixer() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MIXER; }
 
@@ -1181,8 +1225,9 @@ struct Mixer : public Message {
 };
 
 // MSP_SET_MIXER: 43
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetMixer : public Message {
-    SetMixer(FirmwareVariant v) : Message(v) {}
+    SetMixer() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_MIXER; }
 
@@ -1244,8 +1289,9 @@ struct RxConfigSettings {
 };
 
 // MSP_RX_CONFIG: 44
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RxConfig : public RxConfigSettings, public Message {
-    RxConfig(FirmwareVariant v) : Message(v) {}
+    RxConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RX_CONFIG; }
 
@@ -1291,8 +1337,9 @@ struct RxConfig : public RxConfigSettings, public Message {
 };
 
 // MSP_SET_RX_CONFIG: 45
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRxConfig : public RxConfigSettings, public Message {
-    SetRxConfig(FirmwareVariant v) : Message(v) {}
+    SetRxConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RX_CONFIG; }
 
@@ -1352,8 +1399,9 @@ struct HsvColor : public Packable {
 };
 
 // MSP_LED_COLORS: 46
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct LedColors : public Message {
-    LedColors(FirmwareVariant v) : Message(v) {}
+    LedColors() : Message() {}
 
     virtual ID id() const override { return ID::MSP_LED_COLORS; }
 
@@ -1369,8 +1417,9 @@ struct LedColors : public Message {
 };
 
 // MSP_SET_LED_COLORS: 47
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetLedColors : public Message {
-    SetLedColors(FirmwareVariant v) : Message(v) {}
+    SetLedColors() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_LED_COLORS; }
 
@@ -1390,8 +1439,9 @@ struct SetLedColors : public Message {
 };
 
 // MSP_LED_STRIP_CONFIG: 48
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct LedStripConfigs : public Message {
-    LedStripConfigs(FirmwareVariant v) : Message(v) {}
+    LedStripConfigs() : Message() {}
 
     virtual ID id() const override { return ID::MSP_LED_STRIP_CONFIG; }
 
@@ -1407,8 +1457,9 @@ struct LedStripConfigs : public Message {
 };
 
 // MSP_SET_LED_STRIP_CONFIG: 49
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetLedStripConfig : public Message {
-    SetLedStripConfig(FirmwareVariant v) : Message(v) {}
+    SetLedStripConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_LED_STRIP_CONFIG; }
 
@@ -1426,8 +1477,9 @@ struct SetLedStripConfig : public Message {
 };
 
 // MSP_RSSI_CONFIG: 50
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RssiConfig : public Message {
-    RssiConfig(FirmwareVariant v) : Message(v) {}
+    RssiConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RSSI_CONFIG; }
 
@@ -1439,8 +1491,9 @@ struct RssiConfig : public Message {
 };
 
 // MSP_SET_RSSI_CONFIG: 51
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRssiConfig : public Message {
-    SetRssiConfig(FirmwareVariant v) : Message(v) {}
+    SetRssiConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RSSI_CONFIG; }
 
@@ -1463,8 +1516,9 @@ struct adjustmentRange {
 };
 
 // MSP_ADJUSTMENT_RANGES: 52
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct AdjustmentRanges : public Message {
-    AdjustmentRanges(FirmwareVariant v) : Message(v) {}
+    AdjustmentRanges() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ADJUSTMENT_RANGES; }
 
@@ -1485,8 +1539,9 @@ struct AdjustmentRanges : public Message {
 };
 
 // MSP_SET_ADJUSTMENT_RANGE: 53
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetAdjustmentRange : public Message {
-    SetAdjustmentRange(FirmwareVariant v) : Message(v) {}
+    SetAdjustmentRange() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_ADJUSTMENT_RANGE; }
 
@@ -1518,8 +1573,9 @@ struct CfSerialConfigSettings {
 };
 
 // MSP_CF_SERIAL_CONFIG: 54
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CfSerialConfig : public Message {
-    CfSerialConfig(FirmwareVariant v) : Message(v) {}
+    CfSerialConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_CF_SERIAL_CONFIG; }
 
@@ -1542,8 +1598,9 @@ struct CfSerialConfig : public Message {
 };
 
 // MSP_SET_CF_SERIAL_CONFIG: 55
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetCfSerialConfig : public Message {
-    SetCfSerialConfig(FirmwareVariant v) : Message(v) {}
+    SetCfSerialConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_CF_SERIAL_CONFIG; }
 
@@ -1573,8 +1630,9 @@ struct VoltageMeterConfigSettings {
 };
 
 // MSP_VOLTAGE_METER_CONFIG: 56 (differs from Cleanflight/BetaFlight)
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct VoltageMeterConfig : public VoltageMeterConfigSettings, public Message {
-    VoltageMeterConfig(FirmwareVariant v) : Message(v) {}
+    VoltageMeterConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_VOLTAGE_METER_CONFIG; }
 
@@ -1589,9 +1647,10 @@ struct VoltageMeterConfig : public VoltageMeterConfigSettings, public Message {
 };
 
 // MSP_SET_VOLTAGE_METER_CONFIG: 57 (differs from Cleanflight/BetaFlight)
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetVoltageMeterConfig : public VoltageMeterConfigSettings,
                                public Message {
-    SetVoltageMeterConfig(FirmwareVariant v) : Message(v) {}
+    SetVoltageMeterConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_VOLTAGE_METER_CONFIG; }
 
@@ -1608,8 +1667,9 @@ struct SetVoltageMeterConfig : public VoltageMeterConfigSettings,
 };
 
 // MSP_SONAR_ALTITUDE: 58
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SonarAltitude : public Message {
-    SonarAltitude(FirmwareVariant v) : Message(v) {}
+    SonarAltitude() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SONAR_ALTITUDE; }
 
@@ -1621,8 +1681,9 @@ struct SonarAltitude : public Message {
 };
 
 // MSP_PID_CONTROLLER: 59
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct PidController : public Message {
-    PidController(FirmwareVariant v) : Message(v) {}
+    PidController() : Message() {}
 
     virtual ID id() const override { return ID::MSP_PID_CONTROLLER; }
 
@@ -1634,8 +1695,9 @@ struct PidController : public Message {
 };
 
 // MSP_SET_PID_CONTROLLER: 60
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetPidController : public Message {
-    SetPidController(FirmwareVariant v) : Message(v) {}
+    SetPidController() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_PID_CONTROLLER; }
 };
@@ -1648,8 +1710,9 @@ struct ArmingConfigSettings {
 };
 
 // MSP_ARMING_CONFIG: 61
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ArmingConfig : public ArmingConfigSettings, public Message {
-    ArmingConfig(FirmwareVariant v) : Message(v) {}
+    ArmingConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ARMING_CONFIG; }
 
@@ -1663,8 +1726,9 @@ struct ArmingConfig : public ArmingConfigSettings, public Message {
 };
 
 // MSP_SET_ARMING_CONFIG: 62
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetArmingConfig : public ArmingConfigSettings, public Message {
-    SetArmingConfig(FirmwareVariant v) : Message(v) {}
+    SetArmingConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_ARMING_CONFIG; }
 
@@ -1692,8 +1756,9 @@ struct RxMapSettings {
 };
 
 // MSP_RX_MAP: 64
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RxMap : public RxMapSettings, public Message {
-    RxMap(FirmwareVariant v) : Message(v) {}
+    RxMap() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RX_MAP; }
 
@@ -1712,8 +1777,9 @@ struct RxMap : public RxMapSettings, public Message {
 };
 
 // MSP_SET_RX_MAP: 65
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRxMap : public RxMapSettings, public Message {
-    SetRxMap(FirmwareVariant v) : Message(v) {}
+    SetRxMap() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RX_MAP; }
 
@@ -1746,8 +1812,9 @@ struct BfConfigSettings {
 
 // MSP_BF_CONFIG: 66, //out message baseflight-specific settings that aren't
 // covered elsewhere
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BfConfig : public BfConfigSettings, public Message {
-    BfConfig(FirmwareVariant v) : Message(v) {}
+    BfConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BF_CONFIG; }
 
@@ -1766,8 +1833,9 @@ struct BfConfig : public BfConfigSettings, public Message {
 };
 
 // MSP_SET_BF_CONFIG: 67, //in message baseflight-specific settings save
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetBfConfig : public BfConfigSettings, public Message {
-    SetBfConfig(FirmwareVariant v) : Message(v) {}
+    SetBfConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_BF_CONFIG; }
 
@@ -1788,15 +1856,17 @@ struct SetBfConfig : public BfConfigSettings, public Message {
 };
 
 // MSP_REBOOT: 68
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Reboot : public Message {
-    Reboot(FirmwareVariant v) : Message(v) {}
+    Reboot() : Message() {}
 
     virtual ID id() const override { return ID::MSP_REBOOT; }
 };
 
 // MSP_BF_BUILD_INFO: 69
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BfBuildInfo : public Message {
-    BfBuildInfo(FirmwareVariant v) : Message(v) {}
+    BfBuildInfo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BF_BUILD_INFO; }
 
@@ -1814,8 +1884,9 @@ struct BfBuildInfo : public Message {
 };
 
 // MSP_DATAFLASH_SUMMARY: 70
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct DataflashSummary : public Message {
-    DataflashSummary(FirmwareVariant v) : Message(v) {}
+    DataflashSummary() : Message() {}
 
     virtual ID id() const override { return ID::MSP_DATAFLASH_SUMMARY; }
 
@@ -1836,8 +1907,9 @@ struct DataflashSummary : public Message {
 
 // message format differs between iNav and BF/CF
 // MSP_DATAFLASH_READ: 71
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct DataflashRead : public Message {
-    DataflashRead(FirmwareVariant v) : Message(v) {}
+    DataflashRead() : Message() {}
 
     virtual ID id() const override { return ID::MSP_DATAFLASH_READ; }
 
@@ -1866,8 +1938,9 @@ struct DataflashRead : public Message {
 };
 
 // MSP_DATAFLASH_ERASE: 72
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct DataflashErase : public Message {
-    DataflashErase(FirmwareVariant v) : Message(v) {}
+    DataflashErase() : Message() {}
 
     virtual ID id() const override { return ID::MSP_DATAFLASH_ERASE; }
 
@@ -1875,8 +1948,9 @@ struct DataflashErase : public Message {
 };
 
 // MSP_LOOP_TIME: 73
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct LoopTime : public Message {
-    LoopTime(FirmwareVariant v) : Message(v) {}
+    LoopTime() : Message() {}
 
     virtual ID id() const override { return ID::MSP_LOOP_TIME; }
 
@@ -1888,8 +1962,9 @@ struct LoopTime : public Message {
 };
 
 // MSP_SET_LOOP_TIME:74
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetLoopTime : public Message {
-    SetLoopTime(FirmwareVariant v) : Message(v) {}
+    SetLoopTime() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_LOOP_TIME; }
 
@@ -1920,8 +1995,9 @@ struct FailsafeSettings {
 };
 
 // MSP_FAILSAFE_CONFIG: 75
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct FailsafeConfig : public FailsafeSettings, public Message {
-    FailsafeConfig(FirmwareVariant v) : Message(v) {}
+    FailsafeConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_FAILSAFE_CONFIG; }
 
@@ -1948,8 +2024,9 @@ struct FailsafeConfig : public FailsafeSettings, public Message {
 };
 
 // MSP_SET_FAILSAFE_CONFIG: 76
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetFailsafeConfig : public FailsafeSettings, public Message {
-    SetFailsafeConfig(FirmwareVariant v) : Message(v) {}
+    SetFailsafeConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_FAILSAFE_CONFIG; }
 
@@ -1982,8 +2059,9 @@ struct RxFailChannelSettings {
 };
 
 // MSP_RXFAIL_CONFIG: 77
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RxFailConfigs : public Message {
-    RxFailConfigs(FirmwareVariant v) : Message(v) {}
+    RxFailConfigs() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RXFAIL_CONFIG; }
 
@@ -2003,8 +2081,9 @@ struct RxFailConfigs : public Message {
 };
 
 // MSP_SET_RXFAIL_CONFIG: 78
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRxFailConfigs : public RxFailChannelSettings, public Message {
-    SetRxFailConfigs(FirmwareVariant v) : Message(v) {}
+    SetRxFailConfigs() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RXFAIL_CONFIG; }
 
@@ -2020,8 +2099,9 @@ struct SetRxFailConfigs : public RxFailChannelSettings, public Message {
 };
 
 // MSP_SDCARD_SUMMARY: 79
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SdcardSummary : public Message {
-    SdcardSummary(FirmwareVariant v) : Message(v) {}
+    SdcardSummary() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SDCARD_SUMMARY; }
 
@@ -2051,8 +2131,9 @@ struct BlackboxConfigSettings {
 };
 
 // MSP_BLACKBOX_CONFIG: 80
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BlackboxConfig : public BlackboxConfigSettings, public Message {
-    BlackboxConfig(FirmwareVariant v) : Message(v) {}
+    BlackboxConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BLACKBOX_CONFIG; }
 
@@ -2074,8 +2155,9 @@ struct BlackboxConfig : public BlackboxConfigSettings, public Message {
 };
 
 // MSP_SET_BLACKBOX_CONFIG: 81
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetBlackboxConfig : public BlackboxConfigSettings, public Message {
-    SetBlackboxConfig(FirmwareVariant v) : Message(v) {}
+    SetBlackboxConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_BLACKBOX_CONFIG; }
 
@@ -2097,8 +2179,9 @@ struct TransponderConfigSettings {
 };
 
 // MSP_TRANSPONDER_CONFIG: 82
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct TransponderConfig : public Message {
-    TransponderConfig(FirmwareVariant v) : Message(v) {}
+    TransponderConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_TRANSPONDER_CONFIG; }
 
@@ -2128,8 +2211,9 @@ struct TransponderConfig : public Message {
 };
 
 // MSP_SET_TRANSPONDER_CONFIG: 83
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetTransponderConfig : public Message {
-    SetTransponderConfig(FirmwareVariant v) : Message(v) {}
+    SetTransponderConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_TRANSPONDER_CONFIG; }
 
@@ -2148,8 +2232,9 @@ struct SetTransponderConfig : public Message {
 
 // Differences between iNav and BF/CF
 // MSP_OSD_CONFIG: 84
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct OsdConfig : public Message {
-    OsdConfig(FirmwareVariant v) : Message(v) {}
+    OsdConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_OSD_CONFIG; }
 
@@ -2185,8 +2270,9 @@ struct OsdConfig : public Message {
 };
 
 // MSP_SET_OSD_CONFIG: 85
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetOsdConfig : public Message {
-    SetOsdConfig(FirmwareVariant v) : Message(v) {}
+    SetOsdConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_OSD_CONFIG; }
 
@@ -2226,8 +2312,9 @@ struct SetOsdConfig : public Message {
 // MSP_OSD_CHAR_READ: 86 No reference implementation
 
 // MSP_OSD_CHAR_WRITE: 87
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct OsdCharWrite : public Message {
-    OsdCharWrite(FirmwareVariant v) : Message(v) {}
+    OsdCharWrite() : Message() {}
 
     virtual ID id() const override { return ID::MSP_OSD_CHAR_WRITE; }
 
@@ -2247,8 +2334,9 @@ struct OsdCharWrite : public Message {
 };
 
 // MSP_VTX_CONFIG: 88
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct VtxConfig : public Message {
-    VtxConfig(FirmwareVariant v) : Message(v) {}
+    VtxConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_VTX_CONFIG; }
 
@@ -2279,8 +2367,9 @@ struct VtxConfig : public Message {
 };
 
 // MSP_SET_VTX_CONFIG: 89
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetVtxConfig : public Message {
-    SetVtxConfig(FirmwareVariant v) : Message(v) {}
+    SetVtxConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_VTX_CONFIG; }
 
@@ -2322,8 +2411,9 @@ struct AdvancedConfigSettings {
 
 // Betaflight Additional Commands
 // MSP_ADVANCED_CONFIG: 90
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct AdvancedConfig : public AdvancedConfigSettings, public Message {
-    AdvancedConfig(FirmwareVariant v) : Message(v) {}
+    AdvancedConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ADVANCED_CONFIG; }
 
@@ -2346,8 +2436,9 @@ struct AdvancedConfig : public AdvancedConfigSettings, public Message {
 };
 
 // MSP_SET_ADVANCED_CONFIG: 91
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetAdvancedConfig : public AdvancedConfigSettings, public Message {
-    SetAdvancedConfig(FirmwareVariant v) : Message(v) {}
+    SetAdvancedConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_ADVANCED_CONFIG; }
 
@@ -2382,8 +2473,9 @@ struct FilterConfigSettings {
 };
 
 // MSP_FILTER_CONFIG: 92
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct FilterConfig : public FilterConfigSettings, public Message {
-    FilterConfig(FirmwareVariant v) : Message(v) {}
+    FilterConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_FILTER_CONFIG; }
 
@@ -2408,8 +2500,9 @@ struct FilterConfig : public FilterConfigSettings, public Message {
 };
 
 // MSP_SET_FILTER_CONFIG: 93
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetFilterConfig : public FilterConfigSettings, public Message {
-    SetFilterConfig(FirmwareVariant v) : Message(v) {}
+    SetFilterConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_FILTER_CONFIG; }
 
@@ -2448,8 +2541,9 @@ struct PidAdvancedSettings {
 
 // Difference between iNav and BF/CF
 // MSP_PID_ADVANCED: 94
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct PidAdvanced : public PidAdvancedSettings, public Message {
-    PidAdvanced(FirmwareVariant v) : Message(v) {}
+    PidAdvanced() : Message() {}
 
     virtual ID id() const override { return ID::MSP_PID_ADVANCED; }
 
@@ -2474,8 +2568,9 @@ struct PidAdvanced : public PidAdvancedSettings, public Message {
 };
 
 // MSP_SET_PID_ADVANCED: 95
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetPidAdvanced : public PidAdvancedSettings, public Message {
-    SetPidAdvanced(FirmwareVariant v) : Message(v) {}
+    SetPidAdvanced() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_PID_ADVANCED; }
 
@@ -2509,8 +2604,9 @@ struct SensorConfigSettings {
 };
 
 // MSP_SENSOR_CONFIG: 96
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SensorConfig : public SensorConfigSettings, public Message {
-    SensorConfig(FirmwareVariant v) : Message(v) {}
+    SensorConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SENSOR_CONFIG; }
 
@@ -2531,8 +2627,9 @@ struct SensorConfig : public SensorConfigSettings, public Message {
 };
 
 // MSP_SET_SENSOR_CONFIG: 97
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetSensorConfig : public SensorConfigSettings, public Message {
-    SetSensorConfig(FirmwareVariant v) : Message(v) {}
+    SetSensorConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_SENSOR_CONFIG; }
 
@@ -2553,8 +2650,9 @@ struct SetSensorConfig : public SensorConfigSettings, public Message {
 };
 
 // MSP_CAMERA_CONTROL: 98
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CameraControl : public Message {
-    CameraControl(FirmwareVariant v) : Message(v) {}
+    CameraControl() : Message() {}
 
     virtual ID id() const override { return ID::MSP_CAMERA_CONTROL; }
 
@@ -2568,8 +2666,9 @@ struct CameraControl : public Message {
 };
 
 // MSP_SET_ARMING_DISABLED: 99
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetArmingDisabled : public Message {
-    SetArmingDisabled(FirmwareVariant v) : Message(v) {}
+    SetArmingDisabled() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_ARMING_DISABLED; }
 
@@ -2590,8 +2689,9 @@ struct SetArmingDisabled : public Message {
 /// Requests (1xx)
 
 // MSP_IDENT: 100
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Ident : public Message {
-    Ident(FirmwareVariant v) : Message(v) {}
+    Ident() : Message() {}
 
     virtual ID id() const override { return ID::MSP_IDENT; }
 
@@ -2752,28 +2852,7 @@ struct StatusBase : public Packable {
         rc &= data.pack(box_pack);
         return rc;
     }
-};
-
-// MSP_STATUS: 101
-struct Status : public StatusBase, public Message {
-    Status(FirmwareVariant v) : Message(v) {}
-
-    virtual ID id() const override { return ID::MSP_STATUS; }
-
-    Value<uint16_t> avg_system_load_pct;
-    Value<uint16_t> gyro_cycle_time;
-
-    virtual bool decode(const ByteVector& data) override {
-        bool rc = true;
-        rc &= StatusBase::unpack_from(data);
-
-        if(fw_variant != FirmwareVariant::INAV) {
-            rc &= data.unpack(avg_system_load_pct);
-            rc &= data.unpack(gyro_cycle_time);
-        }
-        return rc;
-    }
-
+    
     bool hasAccelerometer() const {
         return sensors.count(Sensor::Accelerometer);
     }
@@ -2791,8 +2870,8 @@ struct Status : public StatusBase, public Message {
     bool hasPitot() const { return sensors.count(Sensor::Pitot); }
 
     bool isHealthy() const { return sensors.count(Sensor::GeneralHealth); }
-
-    virtual std::ostream& print(std::ostream& s) const override {
+    
+    std::ostream& print(std::ostream& s) const {
         s << "#Status:" << std::endl;
         s << " Cycle time: " << cycle_time << " us" << std::endl;
         s << " I2C errors: " << i2c_errors << std::endl;
@@ -2828,9 +2907,48 @@ struct Status : public StatusBase, public Message {
     }
 };
 
+// MSP_STATUS: 101
+template <FirmwareVariant fv = FirmwareVariant::NONE>
+struct Status : public StatusBase, public Message {
+    Status() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_STATUS; }
+
+    Value<uint16_t> avg_system_load_pct;
+    Value<uint16_t> gyro_cycle_time;
+
+    virtual bool decode(const ByteVector& data) override {
+        bool rc = true;
+        rc &= StatusBase::unpack_from(data);
+        rc &= data.unpack(avg_system_load_pct);
+        rc &= data.unpack(gyro_cycle_time);
+        return rc;
+    }
+
+    virtual std::ostream& print(std::ostream& s) const override {
+        return StatusBase::print(s);
+    }
+};
+
+template <>
+struct Status<FirmwareVariant::INAV> : public StatusBase, public Message {
+    Status() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_STATUS; }
+
+    virtual bool decode(const ByteVector& data) override {
+        return StatusBase::unpack_from(data);
+    }
+
+    virtual std::ostream& print(std::ostream& s) const override {
+        return StatusBase::print(s);
+    }
+};
+
 // MSP_RAW_IMU: 102
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RawImu : public Message {
-    RawImu(FirmwareVariant v) : Message(v) {}
+    RawImu() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RAW_IMU; }
 
@@ -2866,12 +2984,13 @@ struct RawImu : public Message {
 
 // helper class to convert raw imu readigs into standard physic units
 // custom scaling factors have to be derived from the sensor documentation
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ImuSI {
     std::array<Value<float>, 3> acc;   // m/s^2
     std::array<Value<float>, 3> gyro;  // deg/s
     std::array<Value<float>, 3> mag;   // uT
 
-    ImuSI(RawImu raw,
+    ImuSI(RawImu<fv> raw,
           const float acc_1g,     // sensor value at 1g
           const float gyro_unit,  // resolution in 1/(deg/s)
           const float magn_gain,  // scale magnetic value to uT (micro Tesla)
@@ -2901,8 +3020,9 @@ struct ImuSI {
 };
 
 // MSP_SERVO: 103
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Servo : public Message {
-    Servo(FirmwareVariant v) : Message(v) {}
+    Servo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SERVO; }
 
@@ -2925,8 +3045,9 @@ struct Servo : public Message {
 };
 
 // MSP_MOTOR: 104
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Motor : public Message {
-    Motor(FirmwareVariant v) : Message(v) {}
+    Motor() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MOTOR; }
 
@@ -2949,8 +3070,9 @@ struct Motor : public Message {
 };
 
 // MSP_RC: 105
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Rc : public Message {
-    Rc(FirmwareVariant v) : Message(v) {}
+    Rc() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RC; }
 
@@ -2978,8 +3100,9 @@ struct Rc : public Message {
 };
 
 // MSP_RAW_GPS: 106
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RawGPS : public Message {
-    RawGPS(FirmwareVariant v) : Message(v) {}
+    RawGPS() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RAW_GPS; }
 
@@ -3024,8 +3147,9 @@ struct RawGPS : public Message {
 };
 
 // MSP_COMP_GPS: 107
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CompGPS : public Message {
-    CompGPS(FirmwareVariant v) : Message(v) {}
+    CompGPS() : Message() {}
 
     virtual ID id() const override { return ID::MSP_COMP_GPS; }
 
@@ -3053,8 +3177,9 @@ struct CompGPS : public Message {
 
 // TODO validate units
 // MSP_ATTITUDE: 108
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Attitude : public Message {
-    Attitude(FirmwareVariant v) : Message(v) {}
+    Attitude() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ATTITUDE; }
 
@@ -3081,8 +3206,9 @@ struct Attitude : public Message {
 
 // TODO validate units
 // MSP_ALTITUDE: 109
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Altitude : public Message {
-    Altitude(FirmwareVariant v) : Message(v) {}
+    Altitude() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ALTITUDE; }
 
@@ -3118,8 +3244,9 @@ struct Altitude : public Message {
 
 // TODO check amperage units
 // MSP_ANALOG: 110
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Analog : public Message {
-    Analog(FirmwareVariant v) : Message(v) {}
+    Analog() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ANALOG; }
 
@@ -3174,8 +3301,9 @@ struct RcTuningSettings {
 
 // Differences between iNav and BF/CF
 // MSP_RC_TUNING: 111
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RcTuning : public RcTuningSettings, public Message {
-    RcTuning(FirmwareVariant v) : Message(v) {}
+    RcTuning() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RC_TUNING; }
 
@@ -3191,13 +3319,47 @@ struct RcTuning : public RcTuningSettings, public Message {
         rc &= data.unpack(throttle_expo);
         rc &= data.unpack(tpa_breakpoint);
         rc &= data.unpack(rcExpo[2]);
-        if(fw_variant == FirmwareVariant::INAV) return rc;
         rc &= data.unpack(rcRates[2]);
         rc &= data.unpack(rcRates[1]);
         rc &= data.unpack(rcExpo[1]);
         return rc;
     }
+    
+    virtual std::ostream& print(std::ostream& s) const override {
+        return RcTuningSettings::print(s);
+    }
+    
 };
+
+
+template <>
+struct RcTuning<FirmwareVariant::INAV> : public RcTuningSettings, public Message {
+    RcTuning() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_RC_TUNING; }
+
+    virtual bool decode(const ByteVector& data) override {
+        bool rc = true;
+        rc &= data.unpack(rcRates[0]);
+        rc &= data.unpack(rcExpo[0]);
+        for(size_t i = 0; i < 3; ++i) {
+            rc &= data.unpack(rates[0]);
+        }
+        rc &= data.unpack(dynamic_throttle_pid);
+        rc &= data.unpack(throttle_mid);
+        rc &= data.unpack(throttle_expo);
+        rc &= data.unpack(tpa_breakpoint);
+        rc &= data.unpack(rcExpo[2]);
+        return rc;
+        
+    }
+    
+    virtual std::ostream& print(std::ostream& s) const override {
+        return RcTuningSettings::print(s);
+    }
+    
+};
+
 
 // PID struct for messages 112 and 202
 struct PidTerms : public Packable {
@@ -3223,138 +3385,83 @@ struct PidTerms : public Packable {
 };
 
 struct PidSettings {
-    std::array<Value<PidTerms>,
-               static_cast<uint8_t>(PID_Element::PID_ITEM_COUNT)>
-        entry;
+    std::vector<Value<PidTerms>> pid_groups;
 
     std::ostream& print(std::ostream& s) const {
-        uint8_t PID_ROLL =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_ROLL);
-        uint8_t PID_PITCH =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_PITCH);
-        uint8_t PID_YAW = static_cast<uint8_t>(msp::msg::PID_Element::PID_YAW);
-        uint8_t PID_POS_Z =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_POS_Z);
-        uint8_t PID_POS_XY =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_POS_XY);
-        uint8_t PID_VEL_XY =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_VEL_XY);
-        uint8_t PID_SURFACE =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_SURFACE);
-        uint8_t PID_LEVEL =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_LEVEL);
-        uint8_t PID_HEADING =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_HEADING);
-        uint8_t PID_VEL_Z =
-            static_cast<uint8_t>(msp::msg::PID_Element::PID_VEL_Z);
-
         s << std::setprecision(3);
         s << "#PID:" << std::endl;
-        s << " Name      P     | I     | D     |" << std::endl;
-        s << " ----------------|-------|-------|" << std::endl;
-        s << " Roll:      " << entry[PID_ROLL]().P << "\t| "
-          << entry[PID_ROLL]().I << "\t| " << entry[PID_ROLL]().D << std::endl;
-        s << " Pitch:     " << entry[PID_PITCH]().P << "\t| "
-          << entry[PID_PITCH]().I << "\t| " << entry[PID_PITCH]().D
-          << std::endl;
-        s << " Yaw:       " << entry[PID_YAW]().P << "\t| "
-          << entry[PID_YAW]().I << "\t| " << entry[PID_YAW]().D << std::endl;
-        s << " Altitude:  " << entry[PID_POS_Z]().P << "\t| "
-          << entry[PID_POS_Z]().I << "\t| " << entry[PID_POS_Z]().D
-          << std::endl;
-
-        s << " Position:  " << entry[PID_POS_XY]().P << "\t| "
-          << entry[PID_POS_XY]().I << "\t| " << entry[PID_POS_XY]().D
-          << std::endl;
-        s << " PositionR: " << entry[PID_VEL_XY]().P << "\t| "
-          << entry[PID_VEL_XY]().I << "\t| " << entry[PID_VEL_XY]().D
-          << std::endl;
-        s << " NavR:      " << entry[PID_SURFACE]().P << "\t| "
-          << entry[PID_SURFACE]().I << "\t| " << entry[PID_SURFACE]().D
-          << std::endl;
-        s << " Level:     " << entry[PID_LEVEL]().P << "\t| "
-          << entry[PID_LEVEL]().I << "\t| " << entry[PID_LEVEL]().D
-          << std::endl;
-        s << " Magn:      " << entry[PID_HEADING]().P << "\t| "
-          << entry[PID_HEADING]().I << "\t| " << entry[PID_HEADING]().D
-          << std::endl;
-        s << " Vel:       " << entry[PID_VEL_Z]().P << "\t| "
-          << entry[PID_VEL_Z]().I << "\t| " << entry[PID_VEL_Z]().D
-          << std::endl;
-
+        s << " ID     | P     | I     | D     |" << std::endl;
+        s << " -------|-------|-------|-------|" << std::endl;
+        std::size_t i(0);
+        for (const auto& pid : pid_groups) {
+            s << " " << i++ << "\t| " << uint32_t(pid().P) << "\t| " << uint32_t(pid().I) << "\t| " << uint32_t(pid().D) << std::endl;
+        }
         return s;
     }
 };
 
 // TODO: revisit
 // MSP_PID: 112
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Pid : public PidSettings, public Message {
-    Pid(FirmwareVariant v) : Message(v) {}
+    Pid() : Message() {}
 
     virtual ID id() const override { return ID::MSP_PID; }
 
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
-        for(uint8_t i = 0;
-            i < static_cast<uint8_t>(PID_Element::PID_ITEM_COUNT);
-            ++i) {
-            rc &= data.unpack(entry[i]);
+        std::size_t count = data.unpacking_remaining() / 3;
+        pid_groups.resize(count);
+        for (std::size_t i(0); i < count; ++i) {
+            rc &= data.unpack(pid_groups[i]);
         }
         return rc;
+    }
+    
+    virtual std::ostream& print(std::ostream& s) const override {
+        return PidSettings::print(s);
     }
 };
 
 // MSP_ACTIVEBOXES: 113
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ActiveBoxes : public Message {
-    ActiveBoxes(FirmwareVariant v) : Message(v) {}
+    ActiveBoxes() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ACTIVEBOXES; }
 
-    // box activation pattern
-    std::vector<std::array<std::set<SwitchPosition>, NAUX>> box_pattern;
-
+    std::set<uint8_t> active_ids;
+    ByteVector data_ref;
+    
     virtual bool decode(const ByteVector& data) override {
-        box_pattern.clear();
+        data_ref = data;
         bool rc = true;
-        while(rc && data.unpacking_remaining() > 1) {
-            Value<uint16_t> box_conf;
-            rc &= data.unpack(box_conf);
-            std::array<std::set<SwitchPosition>, NAUX> aux_sp;
-            for(size_t iaux(0); iaux < NAUX; iaux++) {
-                for(size_t ip(0); ip < 3; ip++) {
-                    if(box_conf() & (1 << (iaux * 3 + ip)))
-                        aux_sp[iaux].insert(SwitchPosition(ip));
-                }  // each position (L,M,H)
-            }      // each aux switch
-            box_pattern.push_back(aux_sp);
-        }  // each box
+        std::size_t i(0);
+        while (data.unpacking_remaining()) {
+            uint8_t tmp;
+            rc &= data.unpack(tmp);
+            for (std::size_t j(0); j < 8; ++j) {
+                if (tmp & (1<<j)) active_ids.emplace(i);
+                ++i;
+            }
+        }
         return rc;
     }
-
+    
     virtual std::ostream& print(std::ostream& s) const override {
-        s << "#Box:" << std::endl;
-        for(size_t ibox(0); ibox < box_pattern.size(); ibox++) {
-            s << ibox << " ";
-            for(size_t iaux(0); iaux < box_pattern[ibox].size(); iaux++) {
-                s << "aux" << iaux + 1 << ": ";
-                if(box_pattern[ibox][iaux].count(msp::msg::SwitchPosition::LOW))
-                    s << "L";
-                else
-                    s << "_";
-                if(box_pattern[ibox][iaux].count(msp::msg::SwitchPosition::MID))
-                    s << "M";
-                else
-                    s << "_";
-                if(box_pattern[ibox][iaux].count(
-                       msp::msg::SwitchPosition::HIGH))
-                    s << "H";
-                else
-                    s << "_";
-                s << ", ";
-            }
-            s << std::endl;
+        s << "#Active Box IDs:" << std::endl;
+        for (const auto& id : active_ids) {
+            s << " " << uint32_t(id);
         }
-
+        s << std::endl;
+        
+        s << "Packed bytes: " << std::hex << std::endl;
+        while (data_ref.unpacking_remaining()) {
+            uint8_t tmp;
+            data_ref.unpack(tmp);
+            s << " " << uint32_t(tmp);
+        }
+        s << std::dec << std::endl;
         return s;
     }
 };
@@ -3393,8 +3500,9 @@ struct MiscSettings {
 };
 
 // MSP_MISC: 114
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Misc : public MiscSettings, public Message {
-    Misc(FirmwareVariant v) : Message(v) {}
+    Misc() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MISC; }
 
@@ -3419,11 +3527,16 @@ struct Misc : public MiscSettings, public Message {
         rc &= data.unpack<uint8_t>(cell_warning, 0.1);
         return rc;
     }
+    
+    virtual std::ostream& print(std::ostream& s) const override {
+        return MiscSettings::print(s);
+    }
 };
 
 // MSP_MOTOR_PINS: 115
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct MotorPins : public Message {
-    MotorPins(FirmwareVariant v) : Message(v) {}
+    MotorPins() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MOTOR_PINS; }
 
@@ -3447,8 +3560,9 @@ struct MotorPins : public Message {
 };
 
 // MSP_BOXNAMES: 116
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BoxNames : public Message {
-    BoxNames(FirmwareVariant v) : Message(v) {}
+    BoxNames() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BOXNAMES; }
 
@@ -3477,8 +3591,9 @@ struct BoxNames : public Message {
 };
 
 // MSP_PIDNAMES: 117
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct PidNames : public Message {
-    PidNames(FirmwareVariant v) : Message(v) {}
+    PidNames() : Message() {}
 
     virtual ID id() const override { return ID::MSP_PIDNAMES; }
 
@@ -3507,8 +3622,9 @@ struct PidNames : public Message {
 };
 
 // MSP_WP: 118
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct WayPoint : public Message {
-    WayPoint(FirmwareVariant v) : Message(v) {}
+    WayPoint() : Message() {}
 
     virtual ID id() const override { return ID::MSP_WP; }
 
@@ -3534,8 +3650,9 @@ struct WayPoint : public Message {
 };
 
 // MSP_BOXIDS: 119
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BoxIds : public Message {
-    BoxIds(FirmwareVariant v) : Message(v) {}
+    BoxIds() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BOXIDS; }
 
@@ -3567,8 +3684,9 @@ struct ServoConfRange {
 };
 
 // MSP_SERVO_CONF: 120
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ServoConf : public Message {
-    ServoConf(FirmwareVariant v) : Message(v) {}
+    ServoConf() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SERVO_CONF; }
 
@@ -3587,8 +3705,9 @@ struct ServoConf : public Message {
 };
 
 // MSP_NAV_STATUS: 121
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct NavStatus : public Message {
-    NavStatus(FirmwareVariant v) : Message(v) {}
+    NavStatus() : Message() {}
 
     virtual ID id() const override { return ID::MSP_NAV_STATUS; }
 
@@ -3643,8 +3762,9 @@ struct GpsConf {
 };
 
 // MSP_NAV_CONFIG: 122
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct NavConfig : public Message, public GpsConf {
-    NavConfig(FirmwareVariant v) : Message(v) {}
+    NavConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_NAV_CONFIG; }
 
@@ -3682,8 +3802,9 @@ struct NavConfig : public Message, public GpsConf {
     }
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Motor3dConfig : public Message {
-    Motor3dConfig(FirmwareVariant v) : Message(v) {}
+    Motor3dConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MOTOR_3D_CONFIG; }
 
@@ -3707,8 +3828,9 @@ struct RcDeadbandSettings {
     Value<uint16_t> deadband3d_throttle;
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct RcDeadband : public RcDeadbandSettings, public Message {
-    RcDeadband(FirmwareVariant v) : Message(v) {}
+    RcDeadband() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RC_DEADBAND; }
 
@@ -3728,8 +3850,9 @@ struct SensorAlignmentSettings {
     Value<uint8_t> mag_align;
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SensorAlignment : public SensorAlignmentSettings, public Message {
-    SensorAlignment(FirmwareVariant v) : Message(v) {}
+    SensorAlignment() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SENSOR_ALIGNMENT; }
 
@@ -3742,8 +3865,9 @@ struct SensorAlignment : public SensorAlignmentSettings, public Message {
     }
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct LedStripModecolor : public Message {
-    LedStripModecolor(FirmwareVariant v) : Message(v) {}
+    LedStripModecolor() : Message() {}
 
     virtual ID id() const override { return ID::MSP_LED_STRIP_MODECOLOR; }
 
@@ -3777,8 +3901,9 @@ struct VoltageMeter {
     Value<uint8_t> val;
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct VoltageMeters : public Message {
-    VoltageMeters(FirmwareVariant v) : Message(v) {}
+    VoltageMeters() : Message() {}
 
     virtual ID id() const override { return ID::MSP_VOLTAGE_METERS; }
 
@@ -3800,8 +3925,9 @@ struct CurrentMeter {
     Value<uint16_t> mA;
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CurrentMeters : public Message {
-    CurrentMeters(FirmwareVariant v) : Message(v) {}
+    CurrentMeters() : Message() {}
 
     virtual ID id() const override { return ID::MSP_CURRENT_METERS; }
 
@@ -3818,8 +3944,9 @@ struct CurrentMeters : public Message {
     }
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BatteryState : public Message {
-    BatteryState(FirmwareVariant v) : Message(v) {}
+    BatteryState() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BATTERY_STATE; }
 
@@ -3848,8 +3975,9 @@ struct MotorConfigSettings {
     Value<uint16_t> min_command;
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct MotorConfig : public MotorConfigSettings, public Message {
-    MotorConfig(FirmwareVariant v) : Message(v) {}
+    MotorConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MOTOR_CONFIG; }
 
@@ -3869,8 +3997,9 @@ struct GpsConfigSettings {
     Value<uint8_t> auto_baud;
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct GpsConfig : public GpsConfigSettings, public Message {
-    GpsConfig(FirmwareVariant v) : Message(v) {}
+    GpsConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_GPS_CONFIG; }
 
@@ -3884,8 +4013,9 @@ struct GpsConfig : public GpsConfigSettings, public Message {
     }
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CompassConfig : public Message {
-    CompassConfig(FirmwareVariant v) : Message(v) {}
+    CompassConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_COMPASS_CONFIG; }
 
@@ -3901,8 +4031,9 @@ struct EscData {
     Value<uint16_t> rpm;
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct EscSensorData : public Message {
-    EscSensorData(FirmwareVariant v) : Message(v) {}
+    EscSensorData() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ESC_SENSOR_DATA; }
 
@@ -3926,8 +4057,9 @@ struct EscSensorData : public Message {
     }
 };
 
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct StatusEx : public StatusBase, public Message {
-    StatusEx(FirmwareVariant v) : Message(v) {}
+    StatusEx() : Message() {}
 
     virtual ID id() const override { return ID::MSP_STATUS_EX; }
 
@@ -3942,21 +4074,39 @@ struct StatusEx : public StatusBase, public Message {
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
         rc &= StatusBase::unpack_from(data);
-        if(fw_variant == FirmwareVariant::INAV) {
-            rc &= data.unpack(avg_system_load_pct);
-            rc &= data.unpack(arming_flags);
-            rc &= data.unpack(acc_calibration_axis_flags);
-        }
-        else {
-            rc &= data.unpack(max_profiles);
-            rc &= data.unpack(control_rate_profile);
-        }
+        rc &= data.unpack(max_profiles);
+        rc &= data.unpack(control_rate_profile);
         return rc;
     }
 };
 
+template <>
+struct StatusEx<FirmwareVariant::INAV> : public StatusBase, public Message {
+    StatusEx() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_STATUS_EX; }
+
+    // bf/cf fields
+    Value<uint8_t> max_profiles;
+    Value<uint8_t> control_rate_profile;
+    // iNav fields
+    Value<uint16_t> avg_system_load_pct;
+    Value<uint16_t> arming_flags;
+    Value<uint8_t> acc_calibration_axis_flags;
+
+    virtual bool decode(const ByteVector& data) override {
+        bool rc = true;
+        rc &= StatusBase::unpack_from(data);
+        rc &= data.unpack(avg_system_load_pct);
+        rc &= data.unpack(arming_flags);
+        rc &= data.unpack(acc_calibration_axis_flags);
+        return rc;
+    }
+};
+
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SensorStatus : public Message {
-    SensorStatus(FirmwareVariant v) : Message(v) {}
+    SensorStatus() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SENSOR_STATUS; }
 
@@ -3986,8 +4136,9 @@ struct SensorStatus : public Message {
 };
 
 // MSP_UID                         = 160,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Uid : public Message {
-    Uid(FirmwareVariant v) : Message(v) {}
+    Uid() : Message() {}
 
     virtual ID id() const override { return ID::MSP_UID; }
 
@@ -4012,8 +4163,9 @@ struct GpsSvInfoSettings {
 };
 
 // MSP_GPSSVINFO                   = 164,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct GpsSvInfo : public Message {
-    GpsSvInfo(FirmwareVariant v) : Message(v) {}
+    GpsSvInfo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_GPSSVINFO; }
 
@@ -4024,27 +4176,41 @@ struct GpsSvInfo : public Message {
 
     virtual bool decode(const ByteVector& data) override {
         bool rc = true;
-        if(fw_variant == FirmwareVariant::INAV) {
-            rc &= data.consume(4);
-            rc &= data.unpack(hdop);
-        }
-        else {
-            rc &= data.unpack(channel_count);
-            for(uint8_t i = 0; i < channel_count(); ++i) {
-                GpsSvInfoSettings tmp;
-                rc &= data.unpack(tmp.channel);
-                rc &= data.unpack(tmp.sv_id);
-                rc &= data.unpack(tmp.quality);
-                rc &= data.unpack(tmp.cno);
-            }
+        rc &= data.unpack(channel_count);
+        for(uint8_t i = 0; i < channel_count(); ++i) {
+            GpsSvInfoSettings tmp;
+            rc &= data.unpack(tmp.channel);
+            rc &= data.unpack(tmp.sv_id);
+            rc &= data.unpack(tmp.quality);
+            rc &= data.unpack(tmp.cno);
         }
         return rc;
     }
 };
 
+template <>
+struct GpsSvInfo<FirmwareVariant::INAV> : public Message {
+    GpsSvInfo() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_GPSSVINFO; }
+
+    Value<uint8_t> hdop;
+
+    Value<uint8_t> channel_count;
+    std::vector<GpsSvInfoSettings> sv_info;
+
+    virtual bool decode(const ByteVector& data) override {
+        bool rc = true;
+        rc &= data.consume(4);
+        rc &= data.unpack(hdop);
+        return rc;
+    }
+};
+
 // MSP_GPSSTATISTICS               = 166,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct GpsStatistics : public Message {
-    GpsStatistics(FirmwareVariant v) : Message(v) {}
+    GpsStatistics() : Message() {}
 
     virtual ID id() const override { return ID::MSP_GPSSTATISTICS; }
 
@@ -4071,8 +4237,9 @@ struct GpsStatistics : public Message {
 
 // no actual implementations
 // MSP_OSD_VIDEO_CONFIG            = 180,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct OsdVideoConfig : public Message {
-    OsdVideoConfig(FirmwareVariant v) : Message(v) {}
+    OsdVideoConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_OSD_VIDEO_CONFIG; }
 
@@ -4080,15 +4247,17 @@ struct OsdVideoConfig : public Message {
 };
 
 // MSP_SET_OSD_VIDEO_CONFIG        = 181,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetOsdVideoConfig : public Message {
-    SetOsdVideoConfig(FirmwareVariant v) : Message(v) {}
+    SetOsdVideoConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_OSD_VIDEO_CONFIG; }
 };
 
 // MSP_DISPLAYPORT                 = 182,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Displayport : public Message {
-    Displayport(FirmwareVariant v) : Message(v) {}
+    Displayport() : Message() {}
 
     virtual ID id() const override { return ID::MSP_DISPLAYPORT; }
 
@@ -4115,8 +4284,9 @@ struct Displayport : public Message {
 
 // Not available in iNav (183-185)
 // MSP_COPY_PROFILE                = 183,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CopyProfile : public Message {
-    CopyProfile(FirmwareVariant v) : Message(v) {}
+    CopyProfile() : Message() {}
 
     virtual ID id() const override { return ID::MSP_COPY_PROFILE; }
 
@@ -4141,8 +4311,9 @@ struct BeeperConfigSettings {
 };
 
 // MSP_BEEPER_CONFIG               = 184,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct BeeperConfig : public BeeperConfigSettings, public Message {
-    BeeperConfig(FirmwareVariant v) : Message(v) {}
+    BeeperConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_BEEPER_CONFIG; }
 
@@ -4155,8 +4326,9 @@ struct BeeperConfig : public BeeperConfigSettings, public Message {
 };
 
 // MSP_SET_BEEPER_CONFIG           = 185,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetBeeperConfig : public BeeperConfigSettings, public Message {
-    SetBeeperConfig(FirmwareVariant v) : Message(v) {}
+    SetBeeperConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_BEEPER_CONFIG; }
 
@@ -4174,8 +4346,9 @@ struct SetBeeperConfig : public BeeperConfigSettings, public Message {
 
 // MSP_SET_TX_INFO                 = 186, // in message           Used to send
 // runtime information from TX lua scripts to the firmware
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetTxInfo : public Message {
-    SetTxInfo(FirmwareVariant v) : Message(v) {}
+    SetTxInfo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_TX_INFO; }
 
@@ -4190,8 +4363,9 @@ struct SetTxInfo : public Message {
 
 // MSP_TX_INFO                     = 187, // out message          Used by TX lua
 // scripts to read information from the firmware
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct TxInfo : public Message {
-    TxInfo(FirmwareVariant v) : Message(v) {}
+    TxInfo() : Message() {}
 
     virtual ID id() const override { return ID::MSP_TX_INFO; }
 
@@ -4213,8 +4387,9 @@ struct TxInfo : public Message {
 // This message is accepted but ignored on betaflight 3.0.1 onwards
 // if "USE_RX_MSP" is not defined for the target. In this case, you can manually
 // add "#define USE_RX_MSP" to your 'target.h'.
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRawRc : public Message {
-    SetRawRc(FirmwareVariant v) : Message(v) {}
+    SetRawRc() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RAW_RC; }
 
@@ -4232,8 +4407,9 @@ struct SetRawRc : public Message {
 };
 
 // MSP_SET_RAW_GPS: 201
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRawGPS : public Message {
-    SetRawGPS(FirmwareVariant v) : Message(v) {}
+    SetRawGPS() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RAW_GPS; }
 
@@ -4260,18 +4436,17 @@ struct SetRawGPS : public Message {
 };
 
 // MSP_SET_PID: 202,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetPid : public PidSettings, public Message {
-    SetPid(FirmwareVariant v) : Message(v) {}
+    SetPid() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_PID; }
 
     virtual ByteVectorUptr encode() const override {
         ByteVectorUptr data = std::make_unique<ByteVector>();
         bool rc             = true;
-        for(uint8_t i = 0;
-            i < static_cast<uint8_t>(PID_Element::PID_ITEM_COUNT);
-            ++i) {
-            rc &= data->pack(entry[i]);
+        for (const auto& pid : pid_groups) {
+            rc &= data->pack(pid);
         }
         if(!rc) data.reset();
         return data;
@@ -4280,16 +4455,59 @@ struct SetPid : public PidSettings, public Message {
 
 // Depricated - no examples
 // MSP_SET_BOX: 203,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetBox : public Message {
-    SetBox(FirmwareVariant v) : Message(v) {}
+    SetBox() : Message() {}
+
+    std::set<uint8_t> requested_box_ids;
 
     virtual ID id() const override { return ID::MSP_SET_BOX; }
+    
+    virtual ByteVectorUptr encode() const override {
+        ByteVectorUptr data = std::make_unique<ByteVector>();
+        bool rc = true;
+        uint8_t tmp = 0;
+        size_t byte_idx = 0;
+        for (const auto &box_id : requested_box_ids) {
+            while (box_id/8 > byte_idx) {
+                rc &= data->pack(tmp);
+                tmp = 0;
+                ++byte_idx;
+            }
+            tmp |= 1<<(box_id%8);
+        }
+        rc &= data->pack(tmp);
+        
+        //~ for (const auto &box_id : requested_box_ids) {
+            //~ rc &= data->pack(box_id);
+        //~ }
+        if(!rc) data.reset();
+        return data;
+    }
+    
+    virtual std::ostream& print(std::ostream& s) const override {
+        s << "#SetBox:" << std::endl;
+        for (const auto& id : requested_box_ids) {
+            s << " " << uint32_t(id);
+        }
+        s << std::endl;
+        auto data = encode();
+        uint8_t tmp;
+        s << "Packed bytes: " << std::endl << std::hex;
+        while (data->unpacking_remaining()) {
+            data->unpack(tmp);
+            s << " " << uint32_t(tmp);
+        }
+        s << std::dec << std::endl;
+        return s;
+    }
 };
 
 // Differences between iNav and BF/CF - this is BF/CF variant
 // MSP_SET_RC_TUNING: 204
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRcTuning : public RcTuningSettings, public Message {
-    SetRcTuning(FirmwareVariant v) : Message(v) {}
+    SetRcTuning() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RC_TUNING; }
 
@@ -4309,9 +4527,7 @@ struct SetRcTuning : public RcTuningSettings, public Message {
 
         if(!rcExpo[2].set()) goto packing_finished;
         rc &= data->pack(rcExpo[2]);
-        // INAV quits her
 
-        if(fw_variant == FirmwareVariant::INAV) goto packing_finished;
         // these fields are optional in BF/CF
 
         if(!rcRates[2].set()) goto packing_finished;
@@ -4329,23 +4545,55 @@ struct SetRcTuning : public RcTuningSettings, public Message {
     }
 };
 
+template <>
+struct SetRcTuning<FirmwareVariant::INAV> : public RcTuningSettings, public Message {
+    SetRcTuning() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_SET_RC_TUNING; }
+
+    virtual ByteVectorUptr encode() const override {
+        ByteVectorUptr data = std::make_unique<ByteVector>();
+        bool rc             = true;
+        rc &= data->pack(rcRates[0]);
+        rc &= data->pack(rcExpo[0]);
+        for(const auto& r : rates) {
+            rc &= data->pack(r);
+        }
+        rc &= data->pack(dynamic_throttle_pid);
+        rc &= data->pack(throttle_mid);
+        rc &= data->pack(throttle_expo);
+        rc &= data->pack(tpa_breakpoint);
+        // this field is optional in all firmwares
+
+        if(!rcExpo[2].set()) goto packing_finished;
+        rc &= data->pack(rcExpo[2]);
+    
+    packing_finished:
+        if(!rc) data.reset();
+        return data;
+    }
+};
+
 // MSP_ACC_CALIBRATION: 205
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct AccCalibration : public Message {
-    AccCalibration(FirmwareVariant v) : Message(v) {}
+    AccCalibration() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ACC_CALIBRATION; }
 };
 
 // MSP_MAG_CALIBRATION: 206
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct MagCalibration : public Message {
-    MagCalibration(FirmwareVariant v) : Message(v) {}
+    MagCalibration() : Message() {}
 
     virtual ID id() const override { return ID::MSP_MAG_CALIBRATION; }
 };
 
 // MSP_SET_MISC: 207
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetMisc : public MiscSettings, public Message {
-    SetMisc(FirmwareVariant v) : Message(v) {}
+    SetMisc() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_MISC; }
 
@@ -4373,15 +4621,17 @@ struct SetMisc : public MiscSettings, public Message {
 };
 
 // MSP_RESET_CONF: 208
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ResetConfig : public Message {
-    ResetConfig(FirmwareVariant v) : Message(v) {}
+    ResetConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RESET_CONF; }
 };
 
 // MSP_SET_WP: 209
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetWp : public Message {
-    SetWp(FirmwareVariant v) : Message(v) {}
+    SetWp() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_WP; }
 
@@ -4404,17 +4654,46 @@ struct SetWp : public Message {
         rc &= data->pack(alt);
         rc &= data->pack(p1);
         rc &= data->pack(p2);
-        if(fw_variant == FirmwareVariant::INAV) {
-            rc &= data->pack(p3);
-        }
+        rc &= data->pack(nav_flag);
+        return data;
+    }
+};
+
+template <>
+struct SetWp<FirmwareVariant::INAV> : public Message {
+    SetWp() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_SET_WP; }
+
+    Value<uint8_t> wp_no;
+    Value<uint32_t> lat;
+    Value<uint32_t> lon;
+    Value<uint32_t> alt;
+
+    Value<uint16_t> p1;
+    Value<uint16_t> p2;
+    Value<uint16_t> p3;
+    Value<uint8_t> nav_flag;
+
+    virtual ByteVectorUptr encode() const override {
+        ByteVectorUptr data = std::make_unique<ByteVector>();
+        bool rc             = true;
+        rc &= data->pack(wp_no);
+        rc &= data->pack(lat);
+        rc &= data->pack(lon);
+        rc &= data->pack(alt);
+        rc &= data->pack(p1);
+        rc &= data->pack(p2);
+        rc &= data->pack(p3);
         rc &= data->pack(nav_flag);
         return data;
     }
 };
 
 // MSP_SELECT_SETTING: 210
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SelectSetting : public Message {
-    SelectSetting(FirmwareVariant v) : Message(v) {}
+    SelectSetting() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SELECT_SETTING; }
 
@@ -4428,8 +4707,9 @@ struct SelectSetting : public Message {
 };
 
 // MSP_SET_HEADING: 211
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetHeading : public Message {
-    SetHeading(FirmwareVariant v) : Message(v) {}
+    SetHeading() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_HEADING; }
 
@@ -4444,8 +4724,9 @@ struct SetHeading : public Message {
 };
 
 // MSP_SET_SERVO_CONF: 212
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetServoConf : public Message {
-    SetServoConf(FirmwareVariant v) : Message(v) {}
+    SetServoConf() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_SERVO_CONF; }
 
@@ -4466,11 +4747,39 @@ struct SetServoConf : public Message {
         rc &= data->pack(max);
         rc &= data->pack(middle);
         rc &= data->pack(rate);
-        if(fw_variant == FirmwareVariant::INAV) {
-            uint8_t tmp = 0;
-            rc &= data->pack(tmp);
-            rc &= data->pack(tmp);
-        }
+        rc &= data->pack(forward_from_channel);
+        rc &= data->pack(reversed_sources);
+        if(!rc) data.reset();
+        return data;
+    }
+};
+
+template <>
+struct SetServoConf<FirmwareVariant::INAV> : public Message {
+    SetServoConf() : Message() {}
+
+    virtual ID id() const override { return ID::MSP_SET_SERVO_CONF; }
+
+    Value<uint8_t> servo_idx;
+    Value<uint16_t> min;
+    Value<uint16_t> max;
+    Value<uint16_t> middle;
+    Value<uint8_t> rate;
+
+    Value<uint8_t> forward_from_channel;
+    Value<uint32_t> reversed_sources;
+
+    virtual ByteVectorUptr encode() const override {
+        ByteVectorUptr data = std::make_unique<ByteVector>();
+        bool rc             = true;
+        rc &= data->pack(servo_idx);
+        rc &= data->pack(min);
+        rc &= data->pack(max);
+        rc &= data->pack(middle);
+        rc &= data->pack(rate);
+        uint8_t tmp = 0;
+        rc &= data->pack(tmp);
+        rc &= data->pack(tmp);
         rc &= data->pack(forward_from_channel);
         rc &= data->pack(reversed_sources);
         if(!rc) data.reset();
@@ -4479,8 +4788,9 @@ struct SetServoConf : public Message {
 };
 
 // MSP_SET_MOTOR: 214
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetMotor : public Message {
-    SetMotor(FirmwareVariant v) : Message(v) {}
+    SetMotor() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_MOTOR; }
 
@@ -4497,15 +4807,17 @@ struct SetMotor : public Message {
 };
 
 // MSP_SET_NAV_CONFIG              = 215
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetNavConfig : public Message {
-    SetNavConfig(FirmwareVariant v) : Message(v) {}
+    SetNavConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_NAV_CONFIG; }
 };
 
 // MSP_SET_MOTOR_3D_CONF           = 217
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetMotor3dConf : public Message {
-    SetMotor3dConf(FirmwareVariant v) : Message(v) {}
+    SetMotor3dConf() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_MOTOR_3D_CONF; }
 
@@ -4525,8 +4837,9 @@ struct SetMotor3dConf : public Message {
 };
 
 // MSP_SET_RC_DEADBAND             = 218
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRcDeadband : public RcDeadbandSettings, public Message {
-    SetRcDeadband(FirmwareVariant v) : Message(v) {}
+    SetRcDeadband() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RC_DEADBAND; }
 
@@ -4543,15 +4856,17 @@ struct SetRcDeadband : public RcDeadbandSettings, public Message {
 };
 
 // MSP_SET_RESET_CURR_PID          = 219
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetResetCurrPid : public Message {
-    SetResetCurrPid(FirmwareVariant v) : Message(v) {}
+    SetResetCurrPid() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RESET_CURR_PID; }
 };
 
 // MSP_SET_SENSOR_ALIGNMENT        = 220
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetSensorAlignment : public SensorAlignmentSettings, public Message {
-    SetSensorAlignment(FirmwareVariant v) : Message(v) {}
+    SetSensorAlignment() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_SENSOR_ALIGNMENT; }
 
@@ -4567,8 +4882,9 @@ struct SetSensorAlignment : public SensorAlignmentSettings, public Message {
 };
 
 // MSP_SET_LED_STRIP_MODECOLOR     = 221
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetLedStripModecolor : public SensorAlignmentSettings, public Message {
-    SetLedStripModecolor(FirmwareVariant v) : Message(v) {}
+    SetLedStripModecolor() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_LED_STRIP_MODECOLOR; }
 
@@ -4590,8 +4906,9 @@ struct SetLedStripModecolor : public SensorAlignmentSettings, public Message {
 // Not available in iNav (222-224)
 // MSP_SET_MOTOR_CONFIG            = 222    //out message         Motor
 // configuration (min/max throttle, etc)
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetMotorConfig : public MotorConfigSettings, public Message {
-    SetMotorConfig(FirmwareVariant v) : Message(v) {}
+    SetMotorConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_MOTOR_CONFIG; }
 
@@ -4608,8 +4925,9 @@ struct SetMotorConfig : public MotorConfigSettings, public Message {
 
 // MSP_SET_GPS_CONFIG              = 223    //out message         GPS
 // configuration
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetGpsConfig : public GpsConfigSettings, public Message {
-    SetGpsConfig(FirmwareVariant v) : Message(v) {}
+    SetGpsConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_GPS_CONFIG; }
 
@@ -4627,8 +4945,9 @@ struct SetGpsConfig : public GpsConfigSettings, public Message {
 
 // MSP_SET_COMPASS_CONFIG          = 224    //out message         Compass
 // configuration
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetCompassConfig : public Message {
-    SetCompassConfig(FirmwareVariant v) : Message(v) {}
+    SetCompassConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_GPS_CONFIG; }
 
@@ -4648,8 +4967,9 @@ struct AccTrimSettings {
 
 // MSP_SET_ACC_TRIM                = 239    //in message          set acc angle
 // trim values
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetAccTrim : public AccTrimSettings, public Message {
-    SetAccTrim(FirmwareVariant v) : Message(v) {}
+    SetAccTrim() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_ACC_TRIM; }
 
@@ -4665,8 +4985,9 @@ struct SetAccTrim : public AccTrimSettings, public Message {
 
 // MSP_ACC_TRIM                    = 240    //out message         get acc angle
 // trim values
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct AccTrim : public AccTrimSettings, public Message {
-    AccTrim(FirmwareVariant v) : Message(v) {}
+    AccTrim() : Message() {}
 
     virtual ID id() const override { return ID::MSP_ACC_TRIM; }
 
@@ -4714,8 +5035,9 @@ struct ServoMixRule : public Packable {
 
 // MSP_SERVO_MIX_RULES             = 241    //out message         Returns servo
 // mixer configuration
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct ServoMixRules : public Message {
-    ServoMixRules(FirmwareVariant v) : Message(v) {}
+    ServoMixRules() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SERVO_MIX_RULES; }
 
@@ -4737,8 +5059,9 @@ struct ServoMixRules : public Message {
 
 // MSP_SET_SERVO_MIX_RULE          = 242    //in message          Sets servo
 // mixer configuration
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetServoMixRule : public Message {
-    SetServoMixRule(FirmwareVariant v) : Message(v) {}
+    SetServoMixRule() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SERVO_MIX_RULES; }
 
@@ -4753,16 +5076,18 @@ struct SetServoMixRule : public Message {
 
 // not used in CF, BF, iNav
 // MSP_PASSTHROUGH_SERIAL          = 244
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct PassthroughSerial : public Message {
-    PassthroughSerial(FirmwareVariant v) : Message(v) {}
+    PassthroughSerial() : Message() {}
 
     virtual ID id() const override { return ID::MSP_PASSTHROUGH_SERIAL; }
 };
 
 // MSP_SET_4WAY_IF                 = 245    //in message          Sets 4way
 // interface
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Set4WayIF : public Message {
-    Set4WayIF(FirmwareVariant v) : Message(v) {}
+    Set4WayIF() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_4WAY_IF; }
 
@@ -4794,8 +5119,9 @@ struct RtcVals {
 
 // MSP_SET_RTC                     = 246    //in message          Sets the RTC
 // clock
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct SetRtc : public RtcVals, public Message {
-    SetRtc(FirmwareVariant v) : Message(v) {}
+    SetRtc() : Message() {}
 
     virtual ID id() const override { return ID::MSP_SET_RTC; }
 
@@ -4811,8 +5137,9 @@ struct SetRtc : public RtcVals, public Message {
 
 // MSP_RTC                         = 247    //out message         Gets the RTC
 // clock
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Rtc : public RtcVals, public Message {
-    Rtc(FirmwareVariant v) : Message(v) {}
+    Rtc() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RTC; }
 
@@ -4825,29 +5152,33 @@ struct Rtc : public RtcVals, public Message {
 };
 
 // MSP_EEPROM_WRITE: 250
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct WriteEEPROM : public Message {
-    WriteEEPROM(FirmwareVariant v) : Message(v) {}
+    WriteEEPROM() : Message() {}
 
     virtual ID id() const override { return ID::MSP_EEPROM_WRITE; }
 };
 
 // MSP_RESERVE_1: 251,    //reserved for system usage
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Reserve1 : public Message {
-    Reserve1(FirmwareVariant v) : Message(v) {}
+    Reserve1() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RESERVE_1; }
 };
 
 // MSP_RESERVE_2: 252,    //reserved for system usage
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Reserve2 : public Message {
-    Reserve2(FirmwareVariant v) : Message(v) {}
+    Reserve2() : Message() {}
 
     virtual ID id() const override { return ID::MSP_RESERVE_2; }
 };
 
 // MSP_DEBUGMSG: 253
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct DebugMessage : public Message {
-    DebugMessage(FirmwareVariant v) : Message(v) {}
+    DebugMessage() : Message() {}
 
     virtual ID id() const override { return ID::MSP_DEBUGMSG; }
 
@@ -4859,8 +5190,9 @@ struct DebugMessage : public Message {
 };
 
 // MSP_DEBUG: 254
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct Debug : public Message {
-    Debug(FirmwareVariant v) : Message(v) {}
+    Debug() : Message() {}
 
     virtual ID id() const override { return ID::MSP_DEBUG; }
 
@@ -4880,16 +5212,18 @@ struct Debug : public Message {
 };
 
 // MSP_V2_FRAME: 255
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct V2Frame : public Message {
-    V2Frame(FirmwareVariant v) : Message(v) {}
+    V2Frame() : Message() {}
 
     virtual ID id() const override { return ID::MSP_V2_FRAME; }
 };
 
 // MSP2_COMMON_TZ                  = 0x1001,  //out message   Gets the TZ offset
 // for the local time (returns: minutes(i16))
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CommonTz : public Message {
-    CommonTz(FirmwareVariant v) : Message(v) {}
+    CommonTz() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_COMMON_TZ; }
 
@@ -4902,8 +5236,9 @@ struct CommonTz : public Message {
 
 // MSP2_COMMON_SET_TZ              = 0x1002,  //in message    Sets the TZ offset
 // for the local time (args: minutes(i16))
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CommonSetTz : public Message {
-    CommonSetTz(FirmwareVariant v) : Message(v) {}
+    CommonSetTz() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_COMMON_SET_TZ; }
 
@@ -4929,8 +5264,9 @@ enum class DATA_TYPE : uint8_t {
 
 // MSP2_COMMON_SETTING             = 0x1003,  //in/out message   Returns the
 // value for a setting
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CommonSetting : public Message {
-    CommonSetting(FirmwareVariant v) : Message(v) {}
+    CommonSetting() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_COMMON_SETTING; }
 
@@ -5014,8 +5350,9 @@ struct CommonSetting : public Message {
 
 // MSP2_COMMON_SET_SETTING         = 0x1004,  //in message    Sets the value for
 // a setting
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CommonSetSetting : public Message {
-    CommonSetSetting(FirmwareVariant v) : Message(v) {}
+    CommonSetSetting() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_COMMON_SET_SETTING; }
 
@@ -5079,8 +5416,9 @@ struct MotorMixer : public Packable {
 };
 
 // MSP2_COMMON_MOTOR_MIXER         = 0x1005,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CommonMotorMixer : public Message {
-    CommonMotorMixer(FirmwareVariant v) : Message(v) {}
+    CommonMotorMixer() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_COMMON_MOTOR_MIXER; }
 
@@ -5098,8 +5436,9 @@ struct CommonMotorMixer : public Message {
 };
 
 // MSP2_COMMON_SET_MOTOR_MIXER     = 0x1006,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct CommonSetMotorMixer : public Message {
-    CommonSetMotorMixer(FirmwareVariant v) : Message(v) {}
+    CommonSetMotorMixer() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_COMMON_SET_MOTOR_MIXER; }
 
@@ -5117,8 +5456,9 @@ struct CommonSetMotorMixer : public Message {
 };
 
 // MSP2_INAV_STATUS                = 0x2000,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavStatus : public StatusBase, public Message {
-    InavStatus(FirmwareVariant v) : Message(v) {}
+    InavStatus() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_STATUS; }
 
@@ -5219,8 +5559,9 @@ struct InavStatus : public StatusBase, public Message {
 };
 
 // MSP2_INAV_OPTICAL_FLOW          = 0x2001,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavOpticalFlow : public Message {
-    InavOpticalFlow(FirmwareVariant v) : Message(v) {}
+    InavOpticalFlow() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_OPTICAL_FLOW; }
 
@@ -5242,8 +5583,9 @@ struct InavOpticalFlow : public Message {
 };
 
 // MSP2_INAV_ANALOG                = 0x2002,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavAnalog : public Message {
-    InavAnalog(FirmwareVariant v) : Message(v) {}
+    InavAnalog() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_ANALOG; }
 
@@ -5284,8 +5626,9 @@ struct InavMiscSettings {
 };
 
 // MSP2_INAV_MISC                  = 0x2003,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavMisc : public InavMiscSettings, public Message {
-    InavMisc(FirmwareVariant v) : Message(v) {}
+    InavMisc() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_MISC; }
 
@@ -5314,8 +5657,9 @@ struct InavMisc : public InavMiscSettings, public Message {
 };
 
 // MSP2_INAV_SET_MISC              = 0x2004,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavSetMisc : public InavMiscSettings, public Message {
-    InavSetMisc(FirmwareVariant v) : Message(v) {}
+    InavSetMisc() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_SET_MISC; }
 
@@ -5360,8 +5704,9 @@ struct InavBatteryConfigSettings {
 };
 
 // MSP2_INAV_BATTERY_CONFIG        = 0x2005,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavBatteryConfig : public InavBatteryConfigSettings, public Message {
-    InavBatteryConfig(FirmwareVariant v) : Message(v) {}
+    InavBatteryConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_BATTERY_CONFIG; }
 
@@ -5382,8 +5727,9 @@ struct InavBatteryConfig : public InavBatteryConfigSettings, public Message {
 };
 
 // MSP2_INAV_SET_BATTERY_CONFIG    = 0x2006,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavSetBatteryConfig : public InavBatteryConfigSettings, public Message {
-    InavSetBatteryConfig(FirmwareVariant v) : Message(v) {}
+    InavSetBatteryConfig() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_SET_BATTERY_CONFIG; }
 
@@ -5425,8 +5771,9 @@ struct InavRateProfileSettings {
 };
 
 // MSP2_INAV_RATE_PROFILE          = 0x2007,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavRateProfile : public InavRateProfileSettings, public Message {
-    InavRateProfile(FirmwareVariant v) : Message(v) {}
+    InavRateProfile() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_RATE_PROFILE; }
 
@@ -5453,8 +5800,9 @@ struct InavRateProfile : public InavRateProfileSettings, public Message {
 };
 
 // MSP2_INAV_SET_RATE_PROFILE      = 0x2008,
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavSetRateProfile : public InavRateProfileSettings, public Message {
-    InavSetRateProfile(FirmwareVariant v) : Message(v) {}
+    InavSetRateProfile() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_SET_RATE_PROFILE; }
 
@@ -5483,8 +5831,9 @@ struct InavSetRateProfile : public InavRateProfileSettings, public Message {
 };
 
 // MSP2_INAV_AIR_SPEED             = 0x2009
+template <FirmwareVariant fv = FirmwareVariant::NONE>
 struct InavAirSpeed : public InavMiscSettings, public Message {
-    InavAirSpeed(FirmwareVariant v) : Message(v) {}
+    InavAirSpeed() : Message() {}
 
     virtual ID id() const override { return ID::MSP2_INAV_RATE_PROFILE; }
 
@@ -5498,7 +5847,7 @@ struct InavAirSpeed : public InavMiscSettings, public Message {
 }  // namespace msg
 }  // namespace msp
 
-inline std::ostream& operator<<(std::ostream& s, const msp::msg::ImuSI& val) {
+inline std::ostream& operator<<(std::ostream& s, const msp::msg::ImuSI<>& val) {
     return val.print(s);
 }
 

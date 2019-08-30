@@ -43,7 +43,7 @@ add_library(mspclient ${MSP_SOURCE_DIR}/Client.cpp ${MSP_SOURCE_DIR}/PeriodicTim
 target_link_libraries(mspclient ${CMAKE_THREAD_LIBS_INIT})
 
 # high-level API
-add_library(msp_fcu ${MSP_SOURCE_DIR}/FlightController.cpp)
+add_library(msp_fcu ${MSP_SOURCE_DIR}/FlightControllerBase.cpp)
 target_link_libraries(msp_fcu mspclient)
 
 
@@ -51,7 +51,10 @@ target_link_libraries(msp_fcu mspclient)
 ### examples / tests
 
 if(BUILD_EXAMPLES)
-
+    # testing arming
+    add_executable(fcu_arm_test examples/fcu_arm_test.cpp)
+    target_link_libraries(fcu_arm_test msp_fcu)
+    
     # testing publish/subscribe
     add_executable(fcu_test examples/fcu_test.cpp)
     target_link_libraries(fcu_test msp_fcu)
@@ -78,7 +81,7 @@ endif()
 ### installation
 
 #install(TARGETS msp msp_msg_print msp_fcu mspclient
-install(TARGETS msp_fcu mspclient
+install(TARGETS mspclient
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
 install(DIRECTORY ${MSP_INCLUDE_DIR} DESTINATION include/ FILES_MATCHING PATTERN "*.hpp")
@@ -142,5 +145,9 @@ if(BUILD_TESTS)
     add_executable(bytevector_test test/ByteVector_test.cpp)
     target_link_libraries(bytevector_test gtest_main)
     add_test(NAME bytevector_test COMMAND bytevector_test)
+
+    add_executable(client_test test/Client_test.cpp)
+    target_link_libraries(client_test gtest_main)
+    add_test(NAME client_test COMMAND client_test)
 
 endif()

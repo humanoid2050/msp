@@ -5,19 +5,21 @@
 typedef unsigned int uint;
 
 namespace msp {
-namespace client {
+
 
 Client::Client() :
     port(io),
     log_level_(SILENT),
-    msp_ver_(1),
-    fw_variant(FirmwareVariant::INAV) {}
+    msp_ver_(1) {}
 
-Client::~Client() {}
+Client::~Client() 
+{
+    stop();
+}
 
 void Client::setLoggingLevel(const LoggingLevel& level) { log_level_ = level; }
 
-bool Client::setVersion(const int& ver) {
+bool Client::setMspVersion(const int& ver) {
     if(ver == 1 || ver == 2) {
         msp_ver_ = ver;
         return true;
@@ -25,30 +27,28 @@ bool Client::setVersion(const int& ver) {
     return false;
 }
 
-int Client::getVersion() const { return msp_ver_; }
-
-void Client::setVariant(const FirmwareVariant& v) { fw_variant = v; }
-
-FirmwareVariant Client::getVariant() const { return fw_variant; }
+int Client::getMspVersion() const { return msp_ver_; }
 
 bool Client::start(const std::string& device, const size_t baudrate) {
     //sequentially try to start the various components
     int cleanup_level = 0;
-    if (!connectPort(device, baudrate)) {
+    if (!connect(device, baudrate)) {
         cleanup_level = 1;
     } else if (!startReadThread()) {
         cleanup_level = 2;
-    } else if (!startSubscriptions() {
+    } else if (!startSubscriptions()) {
         cleanup_level = 3;
     }
     //if something went wrong, stop everything that was started
     switch (cleanup_level) {
     case 3:
         stopSubscriptions();
+        [[fallthrough]];
     case 2:
         stopReadThread();
+        [[fallthrough]];
     case 1:
-        disconnectPort();
+        disconnect();
     }
     //return true if there was no cleanup to be done (no failures)
     return cleanup_level == 0;
@@ -56,14 +56,14 @@ bool Client::start(const std::string& device, const size_t baudrate) {
 
 bool Client::stop() {
     bool rc = true;
-    rc &= disconnectPort();
+    rc &= disconnect();
     rc &= stopReadThread();
     rc &= stopSubscriptions();
     return rc;
 
 }
 
-bool Client::connectPort(const std::string& device, const size_t baudrate) {
+bool Client::connect(const std::string& device, const size_t baudrate) {
     try {
         port.open(device);
         port.set_option(asio::serial_port::baud_rate(uint(baudrate)));
@@ -84,7 +84,7 @@ bool Client::connectPort(const std::string& device, const size_t baudrate) {
     return isConnected();
 }
 
-bool Client::disconnectPort() {
+bool Client::disconnect() {
     asio::error_code ec;
     port.close(ec);
     if(ec) return false;
@@ -99,7 +99,7 @@ bool Client::startReadThread() {
     // can't start if we are already running
     if(running_.test_and_set()) return false;
     // hit it!
-    thread = std::thread([this] {
+    thread_ = std::thread([this] {
         asio::async_read_until(port,
                                buffer,
                                std::bind(&Client::messageReady,
@@ -119,7 +119,7 @@ bool Client::stopReadThread() {
     bool rc = false;
     if(running_.test_and_set()) {
         io.stop();
-        thread.join();
+        thread_.join();
         io.reset();
         rc = true;
     }
@@ -143,7 +143,7 @@ bool Client::stopSubscriptions() {
     return rc;
 }
 
-bool Client::sendMessage(msp::Message& message, const double& timeout) {
+bool Client::sendMessage(msp::Message& message, const double& timeout) const {
     if(log_level_ >= DEBUG)
         std::cout << "sending message - ID " << size_t(message.id())
                   << std::endl;
@@ -196,7 +196,7 @@ bool Client::sendMessage(msp::Message& message, const double& timeout) {
     return recv_success && decode_success;
 }
 
-bool Client::sendMessageNoWait(const msp::Message& message) {
+bool Client::sendMessageNoWait(const msp::Message& message) const {
     if(log_level_ >= DEBUG)
         std::cout << "async sending message - ID " << size_t(message.id())
                   << std::endl;
@@ -218,7 +218,7 @@ uint8_t Client::extractChar() {
     return uint8_t(buffer.sbumpc());
 }
 
-bool Client::sendData(const msp::ID id, const ByteVector& data) {
+bool Client::sendData(const msp::ID id, const ByteVector& data) const {
     if(log_level_ >= DEBUG)
         std::cout << "sending: " << size_t(id) << " | " << data;
     ByteVector msg;
@@ -248,6 +248,12 @@ bool Client::sendData(const msp::ID id, const ByteVector& data) {
     return (bytes_written == msg.size());
 }
 
+bool Client::sendData(const msp::ID id, const ByteVectorUptr&& data) const
+{
+    if(!data) return sendData(id);
+    return sendData(id, *data);
+}
+    
 ByteVector Client::packMessageV1(const msp::ID id,
                                  const ByteVector& data) const {
     ByteVector msg;
@@ -534,5 +540,4 @@ ReceivedMessage Client::processOneMessageV2() {
     return ret;
 }
 
-}  // namespace client
 }  // namespace msp

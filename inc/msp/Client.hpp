@@ -14,7 +14,7 @@
 #include "Subscription.hpp"
 
 namespace msp {
-namespace client {
+
 
 typedef asio::buffers_iterator<asio::streambuf::const_buffers_type> iterator;
 
@@ -45,7 +45,7 @@ public:
     /**
      * @brief ~Client Destructor
      */
-    ~Client();
+    virtual ~Client();
 
     /**
      * @brief Set the verbosity of the output
@@ -59,31 +59,19 @@ public:
      * @param ver Version of MSP to use
      * @return True if successful
      */
-    bool setVersion(const int& ver);
+    bool setMspVersion(const int& ver);
 
     /**
      * @brief Query the message encoding version
-     * @return Cached path to device
+     * @return Cached msp version
      */
-    int getVersion() const;
-
-    /**
-     * @brief Change the firmware-specific MSP variant
-     * @param device Path to device
-     */
-    void setVariant(const FirmwareVariant& v);
-
-    /**
-     * @brief Query the firmware-specific MSP variant
-     * @return Cached path to device
-     */
-    FirmwareVariant getVariant() const;
+    int getMspVersion() const;
 
     /**
      * @brief Start communications with a flight controller
      * @return True on success
      */
-    bool start(const std::string& device, const size_t baudrate = 115200);
+    virtual bool start(const std::string& device, const size_t baudrate = 115200);
 
     /**
      * @brief Stop communications with a flight controller
@@ -108,13 +96,13 @@ public:
      * @param timeout Maximum amount of time to block waiting for a response.
      * A value of 0 (default) means wait forever.
      */
-    bool sendMessage(msp::Message& message, const double& timeout = 0);
+    bool sendMessage(msp::Message& message, const double& timeout = 0) const;
 
     /**
      * @brief Send a message, but do not wait for any response
      * @param message Reference to a Message-derived object to be sent
      */
-    bool sendMessageNoWait(const msp::Message& message);
+    bool sendMessageNoWait(const msp::Message& message) const;
 
     /**
      * @brief Register callback function that is called when a message of
@@ -129,7 +117,7 @@ public:
               class = typename std::enable_if<
                   std::is_base_of<msp::Message, T>::value>::type>
     std::shared_ptr<SubscriptionBase> subscribe(void (C::*callback)(const T&),
-                                                C* context, const double& tp) {
+                                                C* context, const double& tp = 0.0) {
         return subscribe<T>(std::bind(callback, context, std::placeholders::_1),
                             tp);
     }
@@ -145,12 +133,12 @@ public:
     template <typename T, class = typename std::enable_if<
                               std::is_base_of<msp::Message, T>::value>::type>
     std::shared_ptr<SubscriptionBase> subscribe(
-        const std::function<void(const T&)>& recv_callback, const double& tp) {
+        const std::function<void(const T&)>& recv_callback, const double& tp = 0.0) {
         // validate the period
         if(!(tp >= 0.0)) throw std::runtime_error("Period must be positive!");
 
         // get the id of the message in question
-        const msp::ID id = T(fw_variant).id();
+        const msp::ID id = T().id();
         if(log_level_ >= INFO)
             std::cout << "SUBSCRIBING TO " << id << std::endl;
 
@@ -160,7 +148,7 @@ public:
 
         // create a shared pointer to a new Subscription and set all properties
         auto subscription = std::make_shared<Subscription<T>>(
-            recv_callback, send_callback, std::make_unique<T>(fw_variant), tp);
+            recv_callback, send_callback, std::make_unique<T>(), tp);
 
         // gonna modify the subscription map, so lock the mutex
         std::lock_guard<std::mutex> lock(mutex_subscriptions);
@@ -205,7 +193,7 @@ public:
      * outbound)
      * @return true on success
      */
-    bool sendData(const msp::ID id, const ByteVector& data = ByteVector(0));
+    bool sendData(const msp::ID id, const ByteVector& data = ByteVector(0)) const;
 
     /**
      * @brief Send an ID and payload to the flight controller
@@ -214,23 +202,20 @@ public:
      * send
      * @return true on success
      */
-    bool sendData(const msp::ID id, const ByteVectorUptr&& data) {
-        if(!data) return sendData(id);
-        return sendData(id, *data);
-    }
+    bool sendData(const msp::ID id, const ByteVectorUptr&& data) const;
 
 protected:
     /**
      * @brief Establish connection to serial device and start read thread
      * @return True on success
      */
-    bool connectPort(const std::string& device, const size_t baudrate = 115200);
+    bool connect(const std::string& device, const size_t baudrate = 115200);
 
     /**
      * @brief Break connection to serial device and stop read thread
      * @return True on success
      */
-    bool disconnectPort();
+    bool disconnect();
 
     /**
      * @brief Starts the receiver thread that handles incomming messages
@@ -332,20 +317,16 @@ protected:
     uint8_t crcV2(uint8_t crc, const uint8_t& b) const;
 
 protected:
+    
+    
+private:
     asio::io_service io;     ///<! io service
-    asio::serial_port port;  ///<! port for serial device
+    mutable asio::serial_port port;  ///<! port for serial device
     asio::streambuf buffer;
 
     // read thread management
-    std::thread thread;
+    std::thread thread_;
     std::atomic_flag running_ = ATOMIC_FLAG_INIT;
-
-    // thread safety and synchronization
-    std::condition_variable cv_response;
-    std::mutex cv_response_mtx;
-    std::mutex mutex_response;
-    std::mutex mutex_buffer;
-    std::mutex mutex_send;
 
     // holder for received data
     std::unique_ptr<ReceivedMessage> request_received;
@@ -359,10 +340,17 @@ protected:
 
     // reference values
     int msp_ver_;
-    FirmwareVariant fw_variant;
+
+    // thread safety and synchronization
+    mutable std::condition_variable cv_response;
+    mutable std::mutex cv_response_mtx;
+    mutable std::mutex mutex_response;
+    mutable std::mutex mutex_buffer;
+    mutable std::mutex mutex_send;
+    
 };
 
-}  // namespace client
+
 }  // namespace msp
 
 #endif  // CLIENT_HPP

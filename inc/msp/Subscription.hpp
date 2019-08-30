@@ -7,7 +7,6 @@
 #include "PeriodicTimer.hpp"
 
 namespace msp {
-namespace client {
 
 class SubscriptionBase {
 public:
@@ -181,7 +180,7 @@ protected:
     std::unique_ptr<T> io_object_;
 };
 
-}  // namespace client
+
 }  // namespace msp
 
 #endif

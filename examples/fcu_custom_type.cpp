@@ -2,7 +2,7 @@
 #include <iostream>
 
 struct MyIdent : public msp::Message {
-    MyIdent(msp::FirmwareVariant v) : Message(v) {}
+    MyIdent() : Message() {}
 
     virtual msp::ID id() const override { return msp::ID::MSP_IDENT; }
 
@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
     const size_t baudrate = (argc > 2) ? std::stoul(argv[2]) : 115200;
 
     Callbacks cbs;
-    fcu::FlightController fcu;
-    fcu.connect(device, baudrate);
+    msp::FlightController<msp::FirmwareVariant::NONE> fcu;
+    fcu.start(device, baudrate);
 
     // subscribe with costum type
     fcu.subscribe(&Callbacks::onIdent, &cbs, 1);

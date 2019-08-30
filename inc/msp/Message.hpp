@@ -21,29 +21,14 @@ public:
     virtual ID id() const = 0;
 
     /**
-     * @brief Message constructor accepting a FirmwareVariant
-     * @param v FirmwareVariant specifing which firmware this message should
-     * tailor itself to.
+     * @brief Message constructor 
      */
-    Message(FirmwareVariant v) : fw_variant(v) {}
+    Message() {};
 
     /**
      * @brief Message destructor
      */
     virtual ~Message() {}
-
-    /**
-     * @brief Set the firmware the message should work with
-     * @param v FirmwareVariant specifing which firmware this message should
-     * tailor itself to.
-     */
-    void setFirmwareVariant(FirmwareVariant v) { fw_variant = v; }
-
-    /**
-     * @brief Queries the firmware variant the message works with
-     * @returns FirmwareVariant for this message
-     */
-    FirmwareVariant getFirmwareVariant() const { return fw_variant; }
 
     /**
      * @brief Decode message contents from a ByteVector
@@ -65,7 +50,7 @@ public:
     }
 
 protected:
-    FirmwareVariant fw_variant;
+    //FirmwareVariant fw_variant;
 };
 
 }  // namespace msp

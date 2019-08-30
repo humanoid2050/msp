@@ -1,7 +1,7 @@
 #ifndef FLIGHTMODE_HPP
 #define FLIGHTMODE_HPP
 
-namespace fcu {
+namespace msp {
 
 struct FlightMode {
     enum class PRIMARY_MODE : uint32_t {

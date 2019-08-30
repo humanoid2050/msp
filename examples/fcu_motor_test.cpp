@@ -19,8 +19,8 @@ int main(int argc, char *argv[]) {
         (argc > 1) ? std::string(argv[1]) : "/dev/ttyUSB0";
     const size_t baudrate = (argc > 2) ? std::stoul(argv[2]) : 115200;
 
-    fcu::FlightController fcu;
-    fcu.connect(device, baudrate);
+    msp::FlightController<msp::FirmwareVariant::NONE> fcu;
+    fcu.start(device, baudrate);
 
     // spin motors 1 to 4
     fcu.setMotors({{1100, 1100, 1100, 1100, 0, 0, 0, 0}});
