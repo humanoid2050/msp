@@ -81,7 +81,7 @@ endif()
 ### installation
 
 #install(TARGETS msp msp_msg_print msp_fcu mspclient
-install(TARGETS mspclient
+install(TARGETS mspclient msp_fcu
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
 install(DIRECTORY ${MSP_INCLUDE_DIR} DESTINATION include/ FILES_MATCHING PATTERN "*.hpp")
