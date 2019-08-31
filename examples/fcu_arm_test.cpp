@@ -16,11 +16,11 @@ int main(int argc, char *argv[]) {
     msp::msg::InavStatus<> istatus;
     fcu->sendMessage(istatus);
     std::cout << istatus;
-    //fcu->updateModes(std::set<std::string>(), std::set<std::string>{"FAILSAFE"});
+    //fcu->updateMspModes(std::set<std::string>(), std::set<std::string>{"FAILSAFE"});
     std::cout << "modes at start:" << std::endl;
     fcu->printActiveModes();
     std::cout << "adding modes" << std::endl;
-    fcu->updateModes(std::set<std::string>{"ANGLE", "NAV ALTHOLD", "SURFACE"});
+    fcu->updateMspModes(std::set<std::string>{"ANGLE", "NAV ALTHOLD", "SURFACE"});
     std::cout << "arming" << std::endl;
     fcu->arm();
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     fcu->printActiveModes();
 //    fcu->printActiveModes();
     std::cout << "removing modes" << std::endl;
-    fcu->updateModes(std::set<std::string>(), std::set<std::string>{"ANGLE", "NAV ALTHOLD", "SURFACE"});
+    fcu->updateMspModes(std::set<std::string>(), std::set<std::string>{"ANGLE", "NAV ALTHOLD", "SURFACE"});
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::cout << "modes after remove:" << std::endl;
     fcu->printActiveModes();

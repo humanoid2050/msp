@@ -181,7 +181,7 @@ public:
     
     bool setMspModes(const std::set<std::string> &modes);
     
-    bool updateModes (
+    bool updateMspModes (
         const std::set<std::string> &add    = std::set<std::string>(),
         const std::set<std::string> &remove = std::set<std::string>());
     

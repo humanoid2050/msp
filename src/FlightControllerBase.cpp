@@ -227,7 +227,7 @@ bool FlightControllerBase::setMspModes(const std::set<std::string> &modes)
     return true;
 }
 
-bool FlightControllerBase::updateModes (
+bool FlightControllerBase::updateMspModes (
     const std::set<std::string> &add, const std::set<std::string> &remove)
 {
     if (!config_cache_valid_) return false;
@@ -284,12 +284,12 @@ bool FlightControllerBase::isFailsafe() const
 
 bool FlightControllerBase::arm()
 {
-    return updateModes(std::set<std::string>{"ARM"});
+    return updateMspModes(std::set<std::string>{"ARM"});
 }
 
 bool FlightControllerBase::disarm()
 {
-    return updateModes(std::set<std::string>(), std::set<std::string>{"ARM"});
+    return updateMspModes(std::set<std::string>(), std::set<std::string>{"ARM"});
 }
 
 void FlightControllerBase::printActiveModes() const
