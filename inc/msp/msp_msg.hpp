@@ -4404,6 +4404,15 @@ struct SetRawRc : public Message {
         if(!rc) data.reset();
         return data;
     }
+    
+    virtual std::ostream& print(std::ostream& s) const override {
+        s << "#Set RC channels (" << channels.size() << ") :" << std::endl;
+        for(const uint16_t c : channels) {
+            s << c << " ";
+        }
+        s << " " << std::endl;
+        return s;
+    }
 };
 
 // MSP_SET_RAW_GPS: 201

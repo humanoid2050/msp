@@ -56,9 +56,9 @@ bool Client::start(const std::string& device, const size_t baudrate) {
 
 bool Client::stop() {
     bool rc = true;
-    rc &= disconnect();
-    rc &= stopReadThread();
     rc &= stopSubscriptions();
+    rc &= stopReadThread();
+    rc &= disconnect();
     return rc;
 
 }
@@ -330,10 +330,12 @@ void Client::processOneMessage(const asio::error_code& ec,
 
     // ignore and remove header bytes
     const uint8_t msg_marker = extractChar();
-    if(msg_marker != '$')
+    if(msg_marker != '$') {
         std::cerr << "Message marker " << size_t(msg_marker)
                   << " is not recognised!" << std::endl;
-
+        std::cerr << "Dumping " << bytes_transferred << " bytes" << std::endl;
+        buffer.consume(bytes_transferred-1);
+    }
     // message version
     int ver                  = 0;
     const uint8_t ver_marker = extractChar();
@@ -342,6 +344,8 @@ void Client::processOneMessage(const asio::error_code& ec,
     if(ver == 0) {
         std::cerr << "Version marker " << size_t(ver_marker)
                   << " is not recognised!" << std::endl;
+        std::cerr << "Dumping " << bytes_transferred << " bytes" << std::endl;
+        buffer.consume(bytes_transferred-2);
     }
 
     ReceivedMessage recv_msg;
@@ -417,9 +421,11 @@ std::pair<iterator, bool> Client::messageReady(iterator begin,
     }
     else {
         for(; i != end; ++i) {
-            if(*i == '$') break;
+            //found the next marker, call for msg processing to dump the garbage
+            if(*i == '$') return std::make_pair(i, true);
         }
-        // implicitly consume all if $ not found
+        //no need to backtrack, but we are still looking for the sync byte
+        return std::make_pair(i, false);
     }
 
     return std::make_pair(i, true);

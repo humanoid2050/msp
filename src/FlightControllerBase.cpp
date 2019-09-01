@@ -67,6 +67,11 @@ void FlightControllerBase::setRPYT(std::array<double, 4> &rpyt)
 
 void FlightControllerBase::generateMSP()
 {
+    std::cout << "generating msp with rpyt ";
+    for (const auto &v : rpyt_) {
+        std::cout << v << " ";
+    }
+    std::cout << std::endl;
     std::vector<uint16_t> cmds(4, 1000);
     {
         std::lock_guard<std::mutex> lock(msp_updates_mutex);
@@ -145,6 +150,7 @@ bool FlightControllerBase::setRc(const std::vector<uint16_t>& channels)
 {
     msp::msg::SetRawRc<> rc;
     rc.channels = channels;
+    std::cout << rc << std::endl;
     return sendMessageNoWait(rc);
 }
 
