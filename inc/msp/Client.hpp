@@ -240,6 +240,8 @@ protected:
      * @return True on success
      */
     bool stopSubscriptions();
+    
+    void queueAsyncRead();
 
     /**
      * @brief Read a single byte from either the buffer or the serial device

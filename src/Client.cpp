@@ -100,16 +100,7 @@ bool Client::startReadThread() {
     if(running_.test_and_set()) return false;
     // hit it!
     thread_ = std::thread([this] {
-        asio::async_read_until(port,
-                               buffer,
-                               std::bind(&Client::messageReady,
-                                         this,
-                                         std::placeholders::_1,
-                                         std::placeholders::_2),
-                               std::bind(&Client::processOneMessage,
-                                         this,
-                                         std::placeholders::_1,
-                                         std::placeholders::_2));
+        queueAsyncRead();
         io.run();
     });
     return true;
@@ -125,6 +116,20 @@ bool Client::stopReadThread() {
     }
     running_.clear();
     return rc;
+}
+
+inline void Client::queueAsyncRead()
+{
+    asio::async_read_until(port,
+                               buffer,
+                               std::bind(&Client::messageReady,
+                                         this,
+                                         std::placeholders::_1,
+                                         std::placeholders::_2),
+                               std::bind(&Client::processOneMessage,
+                                         this,
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
 }
 
 bool Client::startSubscriptions() {
@@ -332,10 +337,14 @@ void Client::processOneMessage(const asio::error_code& ec,
     // ignore and remove header bytes
     const uint8_t msg_marker = extractChar();
     if(msg_marker != '$') {
-        std::cerr << "Message marker " << size_t(msg_marker)
-                  << " is not recognised!" << std::endl;
-        std::cerr << "Dumping " << bytes_transferred << " bytes" << std::endl;
+        if(log_level_ >= WARNING) {
+            std::cerr << "Message marker " << size_t(msg_marker)
+                      << " is not recognised!" << std::endl;
+            std::cerr << "Dumping " << bytes_transferred << " bytes" << std::endl;
+        }
         buffer.consume(bytes_transferred-1);
+        queueAsyncRead();
+        return;
     }
     // message version
     int ver                  = 0;
@@ -343,10 +352,14 @@ void Client::processOneMessage(const asio::error_code& ec,
     if(ver_marker == 'M') ver = 1;
     if(ver_marker == 'X') ver = 2;
     if(ver == 0) {
-        std::cerr << "Version marker " << size_t(ver_marker)
-                  << " is not recognised!" << std::endl;
-        std::cerr << "Dumping " << bytes_transferred << " bytes" << std::endl;
+        if(log_level_ >= WARNING) {
+            std::cerr << "Version marker " << size_t(ver_marker)
+                      << " is not recognised!" << std::endl;
+            std::cerr << "Dumping " << bytes_transferred << " bytes" << std::endl;
+        }
         buffer.consume(bytes_transferred-2);
+        queueAsyncRead();
+        return;
     }
 
     ReceivedMessage recv_msg;
@@ -374,19 +387,10 @@ void Client::processOneMessage(const asio::error_code& ec,
         }
     }
 
-    asio::async_read_until(port,
-                           buffer,
-                           std::bind(&Client::messageReady,
-                                     this,
-                                     std::placeholders::_1,
-                                     std::placeholders::_2),
-                           std::bind(&Client::processOneMessage,
-                                     this,
-                                     std::placeholders::_1,
-                                     std::placeholders::_2));
+    queueAsyncRead();
 
     if(log_level_ >= DEBUG)
-        std::cout << "processOneMessage finished" << std::endl;
+        std::cout << "processOneMessage finished successfully" << std::endl;
 }
 
 std::pair<iterator, bool> Client::messageReady(iterator begin,
