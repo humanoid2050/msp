@@ -10,13 +10,15 @@ FlightControllerBase::FlightControllerBase() :
    
 FlightControllerBase::~FlightControllerBase()
 {
+    msp_timer_.stop();
     stop();
 }
 
 bool FlightControllerBase::start(const std::string& device, const size_t baudrate)
 {
     if (!Client::start(device, baudrate)) return false;
-    return initConfigurationCache();
+    if (!initConfigurationCache()) return false;
+    return msp_timer_.start();
 }
 
 
