@@ -502,6 +502,7 @@ ReceivedMessage Client::processOneMessageV2() {
     uint16_t id           = uint16_t(id_low) | uint16_t(id_high << 8);
     ret.id                = msp::ID(id);
     if(log_level_ >= DEBUG) std::cout << "id: " << size_t(id) << std::endl;
+    
     exp_crc = crcV2(exp_crc, id_low);
     exp_crc = crcV2(exp_crc, id_high);
 

@@ -75,10 +75,10 @@ void FlightControllerBase::generateMSP()
     std::vector<uint16_t> cmds(4, 1000);
     {
         std::lock_guard<std::mutex> lock(msp_updates_mutex);
-        cmds[channel_map_[0]] = uint16_t(rpyt_[0] * 500) + 1500;
-        cmds[channel_map_[1]] = uint16_t(rpyt_[1] * 500) + 1500;
-        cmds[channel_map_[2]] = uint16_t(rpyt_[2] * 500) + 1500;
-        cmds[channel_map_[3]] = uint16_t(rpyt_[3] * 500) + 1500;
+        cmds[channel_map_[0]] = uint16_t(rpyt_[0] * 500 + 1500);
+        cmds[channel_map_[1]] = uint16_t(rpyt_[1] * 500 + 1500);
+        cmds[channel_map_[2]] = uint16_t(rpyt_[2] * 500 + 1500);
+        cmds[channel_map_[3]] = uint16_t(rpyt_[3] * 500 + 1500);
     }
     setRc(cmds);
 }
