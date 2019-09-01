@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 
     auto fcu = msp::FlightControllerFactory::create(device,baudrate);
 
-    fcu->setLoggingLevel(msp::LoggingLevel::INFO);
+    fcu->setLoggingLevel(msp::LoggingLevel::DEBUG);
     // wait for connection
     
     fcu->start(device, baudrate);

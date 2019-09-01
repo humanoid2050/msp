@@ -317,10 +317,11 @@ uint8_t Client::crcV2(uint8_t crc, const uint8_t& b) const {
 
 void Client::processOneMessage(const asio::error_code& ec,
                                const std::size_t& bytes_transferred) {
-    if(log_level_ >= DEBUG)
+    if(log_level_ >= DEBUG) {
         std::cout << "processOneMessage on " << bytes_transferred << " bytes"
                   << std::endl;
-
+        std::cout << "buffer has " << buffer.size() << " chars" << std::endl;
+    }
     if(ec == asio::error::operation_aborted) {
         // operation_aborted error probably means the client is being closed
         // notify waiting request methods
@@ -411,7 +412,7 @@ std::pair<iterator, bool> Client::messageReady(iterator begin,
         if(available < 9) return std::make_pair(begin, false);
 
         const uint16_t payload_size =
-            uint8_t(*(i + 6)) | uint8_t(*(i + 7) << 8);
+            uint16_t(*(i + 6)) | uint16_t(*(i + 7) << 8);
 
         // incomplete xfer
         if(available < size_t(8 + payload_size + 1))
@@ -487,7 +488,7 @@ ReceivedMessage Client::processOneMessageV2() {
 
     // message direction
     const uint8_t dir = extractChar();
-    if(log_level_ >= DEBUG) std::cout << "dir: " << size_t(dir) << std::endl;
+    if(log_level_ >= DEBUG) std::cout << "dir: " << char(dir) << std::endl;
     const bool ok_id = (dir != '!');
 
     // flag
