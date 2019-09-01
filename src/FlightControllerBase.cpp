@@ -270,7 +270,7 @@ bool FlightControllerBase::hasMode(uint8_t permanent_id) const
 bool FlightControllerBase::isModeActive(const std::string &status_name) const
 {
     if (!config_cache_valid_) return false;
-    
+    if (!hasMode(status_name)) return false;
     msp::msg::Status<> status;
     sendMessage(status);
 

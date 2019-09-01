@@ -83,7 +83,8 @@ int main(int argc, char* argv[]) {
     // wait for connection
     
     fcu->start(device, baudrate);
-    
+std::cout << "control state: " << int(fcu->getMspControlState()) << std::endl;
+std::this_thread::sleep_for(std::chrono::seconds(1));
     App app("MultiWii");
     
     fcu->subscribe<msp::msg::RawImu<>>(
