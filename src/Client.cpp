@@ -31,6 +31,8 @@ int Client::getMspVersion() const { return msp_ver_; }
 
 bool Client::start(const std::string& device, const size_t baudrate) {
     //sequentially try to start the various components
+    //if(running_.test_and_set()) return false;
+    
     int cleanup_level = 0;
     if (!connect(device, baudrate)) {
         cleanup_level = 1;
@@ -54,16 +56,32 @@ bool Client::start(const std::string& device, const size_t baudrate) {
     return cleanup_level == 0;
 }
 
-bool Client::stop() {
+bool Client::stop() 
+{
     bool rc = true;
-    rc &= stopSubscriptions();
-    rc &= stopReadThread();
-    rc &= disconnect();
+    //if(running_.test_and_set()) {
+        rc &= stopSubscriptions();
+        rc &= stopReadThread();
+        rc &= disconnect();
+    //}
+    //running_.clear();
     return rc;
-
 }
 
-bool Client::connect(const std::string& device, const size_t baudrate) {
+bool Client::connect(const std::string& device, const size_t& baudrate, const double& timeout) 
+{
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+    //spin forever or until deadline
+    while (timeout == 0.0 || std::chrono::steady_clock::now() < deadline) {
+        //if success return true
+        if (connectOnce(device, baudrate)) return true;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    //guess we failed with a timeout
+    return false;
+}
+
+bool Client::connectOnce(const std::string& device, const size_t& baudrate) {
     try {
         port.open(device);
         port.set_option(asio::serial_port::baud_rate(uint(baudrate)));
@@ -75,11 +93,12 @@ bool Client::connect(const std::string& device, const size_t baudrate) {
             asio::serial_port::stop_bits(asio::serial_port::stop_bits::one));
     }
     catch(const std::system_error& e) {
-        const int ecode = e.code().value();
-        throw std::runtime_error("Error when opening '" + device +
-                                 "': " + e.code().category().message(ecode) +
-                                 " (error code: " + std::to_string(ecode) +
-                                 ")");
+        if (log_level_ >= LoggingLevel::INFO) {
+             const int ecode = e.code().value();
+             std::cout << "Error when opening '" << device << "': ";
+             std::cout << e.code().category().message(ecode) <<" (error code: ";
+             std::cout << std::to_string(ecode) << ")" << std::endl;;
+         }
     }
     return isConnected();
 }
@@ -91,13 +110,17 @@ bool Client::disconnect() {
     return true;
 }
 
-bool Client::isConnected() const { return port.is_open(); }
+bool Client::isConnected() const 
+{
+    return port.is_open(); 
+}
 
-bool Client::startReadThread() {
+bool Client::startReadThread() 
+{
     // no point reading if we arent connected to anything
     if(!isConnected()) return false;
     // can't start if we are already running
-    if(running_.test_and_set()) return false;
+    if(read_thread_running.test_and_set()) return false;
     // hit it!
     thread_ = std::thread([this] {
         queueAsyncRead();
@@ -106,33 +129,31 @@ bool Client::startReadThread() {
     return true;
 }
 
-bool Client::stopReadThread() {
+bool Client::stopReadThread() 
+{
     bool rc = false;
-    if(running_.test_and_set()) {
+    if(read_thread_running.test_and_set()) {
         io.stop();
         thread_.join();
         io.reset();
         rc = true;
     }
-    running_.clear();
+    read_thread_running.clear();
     return rc;
 }
 
 inline void Client::queueAsyncRead()
 {
-    asio::async_read_until(port,
-                               buffer,
-                               std::bind(&Client::messageReady,
-                                         this,
-                                         std::placeholders::_1,
-                                         std::placeholders::_2),
-                               std::bind(&Client::processOneMessage,
-                                         this,
-                                         std::placeholders::_1,
-                                         std::placeholders::_2));
+    asio::async_read_until(
+        port, buffer,
+        std::bind(&Client::messageReady,
+            this, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&Client::processOneMessage,
+            this, std::placeholders::_1, std::placeholders::_2) );
 }
 
-bool Client::startSubscriptions() {
+bool Client::startSubscriptions() 
+{
     bool rc = true;
     for(const auto& sub : subscriptions) {
         rc &= sub.second->start();

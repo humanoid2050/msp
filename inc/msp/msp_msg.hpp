@@ -1861,6 +1861,10 @@ struct Reboot : public Message {
     Reboot() : Message() {}
 
     virtual ID id() const override { return ID::MSP_REBOOT; }
+    
+    virtual bool decode(const ByteVector& /*data*/) override {
+        return true;
+    }
 };
 
 // MSP_BF_BUILD_INFO: 69

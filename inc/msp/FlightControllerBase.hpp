@@ -21,15 +21,20 @@ public:
 
     virtual bool start(const std::string& device, const size_t baudrate = 115200) override;
     
+    virtual bool stop() override;
+    
     virtual FirmwareVariant getInterfaceFwVariant() const = 0;
     
     virtual ControlLevel getMspControlCapability() const = 0;
     
     virtual ControlLevel getMspControlState() const = 0;
     
-    virtual bool setMspControlState(const ControlLevel& level) = 0;
+    virtual bool setMspControlState(ControlLevel level) = 0;
 
-
+    void setDefaultRadioControlType();
+    
+    void setDefaultRadioControlType(const RadioControlType& source);
+    
     /**
      * @brief Sets which instruction source the flight controller should
      * listen to. Also starts periodic MSP control message if MSP is selected
@@ -242,6 +247,9 @@ private:
 private:
     // parameters updated by the connect method to cache flight controller info
     bool config_cache_valid_;
+    
+    std::string device_name_;
+    size_t baudrate_;
     
     std::map<std::string, const uint8_t> box_name_to_perm_id_;
     std::vector<std::string> box_names_;

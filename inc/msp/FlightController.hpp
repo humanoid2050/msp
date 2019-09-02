@@ -38,7 +38,7 @@ public:
         return ControlLevel::NONE;
     }
     
-    virtual bool setMspControlState(const ControlLevel& /*level*/) override {
+    virtual bool setMspControlState(ControlLevel /*level*/) override {
         return false;
     }
     
@@ -60,14 +60,55 @@ ControlLevel FlightController<FirmwareVariant::INAV>::getMspControlState() const
 }
 
 template <>
-bool FlightController<FirmwareVariant::INAV>::setMspControlState(const ControlLevel& level) {
-    if (level == ControlLevel::NONE) {
-        return setRadioControlTypeToCachedDefault();
-    } else if (level == ControlLevel::COMPLETE) {
-        return setRadioControlType(RadioControlType::MSP);
+bool FlightController<FirmwareVariant::INAV>::setMspControlState(ControlLevel level) {
+    //dont do this if there is any chance we are off the ground
+    if (isArmed()) return false;
+    
+    ControlLevel current_level = getMspControlState();
+    
+    //user has asked for automatic selection
+    if (level == ControlLevel::SHARED_OR_COMPLETE) {
+        //is shared even an option in this build?
+        if (getMspControlCapability() == ControlLevel::SHARED_OR_COMPLETE) {
+            //choose shared, unless we are already in complete control
+            if (current_level == ControlLevel::COMPLETE) level = ControlLevel::COMPLETE;
+            else level = ControlLevel::SHARED;
+        } else {
+            level = ControlLevel::COMPLETE;
+        }
     }
-    //we cant actually set shared control via this interface
-    return false;
+    
+    //automatic success if we are already in the correct state
+    if (current_level == level) return true;
+    
+    if (level == ControlLevel::COMPLETE) {
+        if (current_level == ControlLevel::SHARED) {
+            if (!updateMspModes(std::set<std::string>(),std::set<std::string>{"MSP RC OVERRIDE"})) return false;
+        }
+        //this transition requires reboot
+        if (!setRadioControlType(RadioControlType::MSP)) return false;
+        if (!saveSettings()) return false;
+        if (!reboot()) return false;
+    } else if (level == ControlLevel::SHARED) {
+        if (getMspControlCapability() != ControlLevel::SHARED_OR_COMPLETE) return false;
+        
+        //shared only works if the primary radio is not MSP
+        if (!setRadioControlType(RadioControlType::SERIAL)) return false;
+        if (!saveSettings()) return false;
+        if (!reboot()) return false;
+        if (!updateMspModes(std::set<std::string>{"MSP RC OVERRIDE"})) return false;
+    } else if (level == ControlLevel::NONE) {
+        if (current_level == ControlLevel::SHARED) {
+            if (!updateMspModes(std::set<std::string>(),std::set<std::string>{"MSP RC OVERRIDE"})) return false;
+        } else {
+            //TODO: be more intelligent here...
+            if (!setRadioControlTypeToCachedDefault()) return false;
+            if (!saveSettings()) return false;
+            if (!reboot()) return false;
+        }
+    } 
+    
+    return true;
 }
 
 

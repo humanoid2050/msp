@@ -5,6 +5,7 @@ namespace msp {
 FlightControllerBase::FlightControllerBase() : 
     Client(),
     config_cache_valid_(false),
+    default_rx(RadioControlType::NONE),
     msp_timer_(std::bind(&FlightControllerBase::generateMSP, this), 0.1) 
 {}
    
@@ -16,14 +17,24 @@ FlightControllerBase::~FlightControllerBase()
 
 bool FlightControllerBase::start(const std::string& device, const size_t baudrate)
 {
+    device_name_ = device;
+    baudrate_ = baudrate;
     if (!Client::start(device, baudrate)) return false;
     if (!initConfigurationCache()) return false;
     return msp_timer_.start();
 }
 
+bool FlightControllerBase::stop()
+{
+    msp_timer_.stop();
+    config_cache_valid_ = false;
+    return Client::stop();
+}
 
 bool FlightControllerBase::setRadioControlType(const RadioControlType& source)
 {
+    if (source == RadioControlType::NONE) return false;
+    
     //we need to set MSP as the rc source
     if(source == getRadioControlType()) return true;
 
@@ -44,14 +55,22 @@ bool FlightControllerBase::setRadioControlTypeToCachedDefault()
     return setRadioControlType(default_rx);
 }
 
+void FlightControllerBase::setDefaultRadioControlType()
+{
+    default_rx = getRadioControlType();
+}
+    
+void FlightControllerBase::setDefaultRadioControlType(const RadioControlType& source)
+{
+    default_rx = source;
+}
+
 
 RadioControlType FlightControllerBase::getRadioControlType() const
 {
     msp::msg::RxConfig<> rxConfig;
     sendMessage(rxConfig);
-    
     return RadioControlType(rxConfig.receiverType());
-    
 }
 
 
@@ -67,11 +86,6 @@ void FlightControllerBase::setRPYT(std::array<double, 4> &rpyt)
 
 void FlightControllerBase::generateMSP()
 {
-    std::cout << "generating msp with rpyt ";
-    for (const auto &v : rpyt_) {
-        std::cout << v << " ";
-    }
-    std::cout << std::endl;
     std::vector<uint16_t> cmds(4, 1000);
     {
         std::lock_guard<std::mutex> lock(msp_updates_mutex);
@@ -95,7 +109,10 @@ bool FlightControllerBase::reboot()
 {
     config_cache_valid_ = false;
     msp::msg::Reboot<> reboot;
-    return sendMessage(reboot);
+    if (!sendMessage(reboot)) return false;
+    if (!stop()) return false;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return start(device_name_, baudrate_);
 }
 
 
@@ -150,7 +167,6 @@ bool FlightControllerBase::setRc(const std::vector<uint16_t>& channels)
 {
     msp::msg::SetRawRc<> rc;
     rc.channels = channels;
-    std::cout << rc << std::endl;
     return sendMessageNoWait(rc);
 }
 
@@ -407,8 +423,6 @@ bool FlightControllerBase::initConfigurationCache(const double &timeout, const b
         if(print_info) std::cout << rx_map;
         channel_map_ = rx_map.map;
     }
-    
-    default_rx = getRadioControlType();
     
     config_cache_valid_ = true;
     return true;

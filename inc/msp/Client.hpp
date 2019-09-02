@@ -77,7 +77,7 @@ public:
      * @brief Stop communications with a flight controller
      * @return True on success
      */
-    bool stop();
+    virtual bool stop();
 
     /**
      * @brief Query the system to see if a connection is active
@@ -209,7 +209,10 @@ protected:
      * @brief Establish connection to serial device and start read thread
      * @return True on success
      */
-    bool connect(const std::string& device, const size_t baudrate = 115200);
+    bool connect(const std::string& device, const size_t& baudrate = 115200, const double& timeout = 0);
+
+
+    bool connectOnce(const std::string& device, const size_t& baudrate = 115200);
 
     /**
      * @brief Break connection to serial device and stop read thread
@@ -328,7 +331,7 @@ private:
 
     // read thread management
     std::thread thread_;
-    std::atomic_flag running_ = ATOMIC_FLAG_INIT;
+    std::atomic_flag read_thread_running = ATOMIC_FLAG_INIT;
 
     // holder for received data
     std::unique_ptr<ReceivedMessage> request_received;
